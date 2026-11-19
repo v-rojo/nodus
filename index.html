@@ -46,12 +46,45 @@ header.top{display:flex;align-items:center;justify-content:space-between;gap:12p
 .brand small{display:block;font:500 12px/1.3 var(--body);color:var(--ink-2);letter-spacing:0;margin-top:3px}
 .chip-demo{font:500 12px var(--mono);border:1px dashed var(--warn);color:var(--warn);background:var(--warn-soft);padding:5px 10px;border-radius:999px}
 
-.hero{display:grid;grid-template-columns:1.25fr 1fr;gap:24px;align-items:end;padding:8px 0 24px}
-h1{font:800 clamp(28px,4.4vw,46px)/1.04 var(--display);letter-spacing:-.025em;margin:0 0 12px;text-wrap:balance}
+.hero{display:grid;grid-template-columns:1.2fr 1fr;gap:28px;align-items:center;padding:16px 0 32px}
+h1{font:800 clamp(34px,5.4vw,58px)/1.02 var(--display);letter-spacing:-.025em;margin:0 0 12px;text-wrap:balance}
 h2{font:700 20px/1.2 var(--display);margin:0 0 4px;text-wrap:balance}
 h3{font:700 16px/1.25 var(--display);margin:0}
 .lead{color:var(--ink-2);max-width:60ch;margin:0 0 16px}
-.demo-box{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--surface);border-radius:8px;padding:12px 14px;min-height:92px}
+.demo-box{border:1px solid var(--accent);border-left:4px solid var(--accent);background:var(--surface);border-radius:10px;padding:10px 14px;margin:0 0 12px;position:sticky;top:52px;z-index:4;box-shadow:0 6px 20px rgba(0,0,0,.18)}
+.demo-box[hidden]{display:none}
+.journey{list-style:none;margin:0;padding:0;display:flex;gap:8px 18px;flex-wrap:wrap;font-size:14px}
+.journey li{display:flex;align-items:center;gap:8px}
+.journey b{display:grid;place-items:center;width:24px;height:24px;border-radius:50%;background:var(--accent-soft);color:var(--accent);font:700 13px var(--mono)}
+.rolecards{display:grid;gap:10px}
+.rolecard{display:grid;grid-template-columns:44px 1fr;column-gap:12px;align-items:center;text-align:left;border:2px solid var(--line);background:var(--surface);border-radius:14px;padding:14px 16px;cursor:pointer;transition:border-color .15s,transform .15s}
+.rolecard:hover{border-color:var(--accent);transform:translateY(-1px)}
+.rolecard .ic{grid-row:span 2;display:grid;place-items:center;width:44px;height:44px;border-radius:12px;font-size:20px}
+.rolecard b{font:700 18px/1.2 var(--display)}
+.rolecard span:last-child{font-size:13px;color:var(--ink-2)}
+.rolecard.ghost{border-style:dashed}
+.rolecard[disabled]{opacity:.6;cursor:wait}
+.ic-help{background:var(--ok-soft);color:var(--ok)} .ic-need{background:var(--crit-soft);color:var(--crit)} .ic-demo{background:var(--accent-soft);color:var(--accent)}
+.section-h{margin:32px 0 12px}
+.section-h p{margin:2px 0 0;color:var(--ink-2);font-size:14px}
+.principles{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.principle{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px}
+.principle .n{font:700 12px var(--mono);color:var(--accent)}
+.principle b{display:block;font:700 16px/1.25 var(--display);margin:4px 0}
+.principle p{margin:0;font-size:13px;color:var(--ink-2)}
+.ngos{display:grid;gap:12px;grid-template-columns:repeat(auto-fit,minmax(200px,1fr))}
+.ngo{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:grid;gap:8px;align-content:start}
+.ngo h3{font-size:16px}
+.ngo p{margin:0;font-size:13px}
+.ngo cite{font:400 11px var(--mono);color:var(--ink-2);font-style:normal}
+.ngo a,.safe a{color:var(--accent)}
+.safe{display:grid;gap:16px;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);background:var(--ok-soft);border:1px solid var(--ok);border-radius:14px;padding:18px}
+.safe h2{color:var(--ink)}
+.safe ul{margin:8px 0 0;padding:0;list-style:none;display:grid;gap:8px;font-size:14px}
+.safe li{display:grid;grid-template-columns:22px 1fr;gap:6px}
+.safe li:before{content:"✓";color:var(--ok);font-weight:700}
+.safe li.no:before{content:"✕";color:var(--crit)}
+.safe .chan{background:var(--surface);border-radius:10px;padding:12px 14px;display:grid;gap:8px;font-size:14px;align-content:start}
 .demo-box .step{font:500 12px var(--mono);color:var(--accent);margin-bottom:4px}
 .demo-box p{margin:0}
 
@@ -185,7 +218,7 @@ footer{padding:20px 0 40px;color:var(--ink-2);font-size:13px;border-top:1px soli
 .empty{padding:24px;text-align:center;color:var(--ink-2);border:1px dashed var(--line);border-radius:10px}
 @media (max-width:860px){
   .hero{grid-template-columns:1fr}
-  .two{grid-template-columns:1fr}
+  .two,.safe{grid-template-columns:1fr}
   .need-list{grid-template-columns:1fr}
   .catrow{grid-template-columns:1fr;gap:4px}
 }
@@ -204,29 +237,35 @@ footer{padding:20px 0 40px;color:var(--ink-2);font-size:13px;border-top:1px soli
       <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="8" fill="var(--ink)"/><g stroke="var(--paper)" stroke-width="3" stroke-linecap="round"><path d="M8 11h18M8 17h18M8 23h18"/></g><g stroke="var(--accent)" stroke-width="3" stroke-linecap="round" style="mix-blend-mode:normal"><path d="M12 7v7M22 14v7M12 20v7"/></g></svg>
       <div>NODUS<small>Ayuda trazable en red · La Guaira, Venezuela</small></div>
     </div>
-    <div class="actions"><button class="btn ghost small" id="meChip" data-act="onb">Elegir perfil</button><span class="chip-demo">PROTOTIPO · DATOS SIMULADOS</span></div>
+    <div class="actions"><button class="btn ghost small" id="meChip" data-act="onb">Elegir perfil</button><span class="chip-demo">Demo · datos simulados</span></div>
   </header>
 
   <section class="hero">
     <div>
-      <h1>Cada insumo, cada dólar y cada entrega, a la vista.</h1>
-      <p class="lead">MVP para la respuesta al doble terremoto del 24 de junio de 2026 en La Guaira. Elige tu perfil y NODUS te conecta con tu red más cercana. Los campamentos publican lo que necesitan, los centros de acopio mueven lotes con QR y el libro registra cada paso con hashes encadenados.</p>
-      <div class="actions">
-        <button class="btn" id="demoBtn" data-act="demo">Ver una entrega completa</button>
-        <button class="btn ghost" data-act="onb">Quiero ayudar / Necesito ayuda</button><button class="btn ghost" data-act="go" data-tab="necesidades">Explorar por mi cuenta</button>
-      </div>
+      <h1>Ayuda que llega.<br>Y se puede ver.</h1>
+      <p class="lead">Respuesta al terremoto del 24 de junio de 2026 en La Guaira: lo que falta, quién lo cubre y dónde está cada entrega.</p>
+      <ol class="journey" aria-label="Cómo funciona">
+        <li><b>1</b><span>Elige cómo participas</span></li>
+        <li><b>2</b><span>Te conectamos con lo más cercano</span></li>
+        <li><b>3</b><span>Sigue tu ayuda hasta la entrega</span></li>
+      </ol>
     </div>
-    <div class="demo-box" aria-live="polite">
-      <div class="step" id="demoStep">DEMO</div>
-      <p id="demoText">Recorre una entrega completa: de la necesidad publicada en un campamento hasta la confirmación de entrega y el libro de fondos.</p>
+    <div class="rolecards">
+      <button class="rolecard" data-act="pickRole" data-role="ayuda"><span class="ic ic-help" aria-hidden="true">♥</span><b>Quiero ayudar</b><span>Dona, lleva insumos o súmate como voluntario</span></button>
+      <button class="rolecard" data-act="pickRole" data-role="necesito"><span class="ic ic-need" aria-hidden="true">✚</span><b>Necesito ayuda</b><span>Agua, salud, comida o refugio cerca de ti</span></button>
+      <button class="rolecard ghost" id="demoBtn" data-act="demo"><span class="ic ic-demo" aria-hidden="true">▶</span><b>Ver una entrega en 1 minuto</b><span>Del pedido del campamento a la entrega confirmada</span></button>
     </div>
   </section>
+  <div class="demo-box" id="demoBox" aria-live="polite" hidden>
+    <div class="step" id="demoStep">DEMO</div>
+    <p id="demoText"></p>
+  </div>
 
   <nav class="tabs" role="tablist" aria-label="Módulos del MVP" id="tabs"></nav>
   <main id="view"></main>
 
   <footer>
-    Prototipo de MVP con datos simulados. Los nombres de campamentos y centros son referencias geográficas para la demostración; las cantidades, donantes y lotes no representan inventarios ni donaciones reales. Esquema del mapa no a escala. Las cifras del contexto citan sus fuentes.
+    Demo con datos simulados: cantidades, donantes y lotes no son reales. Los datos sobre ONG y contexto citan su fuente.
   </footer>
 </div>
 <div id="modal"></div>
@@ -450,10 +489,10 @@ function vRed(){
   const me=ui.me,mem=state.members,reqs=state.requests;
   const cnt=s=>({m:mem.filter(x=>x.sector===s).length,r:reqs.filter(x=>x.sector===s&&x.status!=='resuelta').length});
   const strip='<div class="secgrid">'+SECTORS.map(s=>{const c=cnt(s),d=me?dist(me.sector,s):9;return '<div class="sec'+(d===0?' me':d===1?' near':'')+'"><b>'+s+'</b>'+(me?'<span class="muted">'+band(d)+'</span><br>':'')+c.m+' '+pl(c.m,'persona ayudando','personas ayudando')+'<br>'+c.r+' '+pl(c.r,'solicitud abierta','solicitudes abiertas')+'</div>';}).join('')+'</div>';
-  if(!me)return '<div class="card"><h2>Tu red cercana</h2><p class="muted" style="margin:4px 0 12px">Elige un perfil y NODUS te conecta con las personas, solicitudes y centros más próximos a tu sector.</p><button class="btn" data-act="onb">Elegir perfil</button></div><div style="margin-top:16px"><h3 style="margin-bottom:10px">Sectores del litoral</h3>'+strip+'</div>';
+  if(!me)return '<div class="card"><h2>Tu red cercana</h2><p class="muted" style="margin:4px 0 12px">Elige un perfil para ver a quién tienes cerca.</p><button class="btn" data-act="onb">Elegir perfil</button></div><div style="margin-top:16px"><h3 style="margin-bottom:10px">Sectores del litoral</h3>'+strip+'</div>';
   const near=x=>dist(me.sector,x.sector)<=1;
   const helpersNear=mem.filter(near).length,openNear=reqs.filter(x=>near(x)&&x.status==='abierta').length,doneAll=reqs.filter(x=>x.status==='resuelta').length;
-  const head='<div class="card-h"><div><h2>Mi red · '+esc(me.sector)+'</h2><div class="muted" style="font-size:13px">'+(me.role==='ayuda'?'Perfil: Quiero ayudar':'Perfil: Necesito ayuda')+' · '+esc(me.alias)+'. La cercanía se calcula por sector del litoral; este prototipo no usa GPS.</div></div><button class="btn ghost small" data-act="onb">Cambiar perfil</button></div>'
+  const head='<div class="card-h"><div><h2>Mi red · '+esc(me.sector)+'</h2><div class="muted" style="font-size:13px">'+(me.role==='ayuda'?'Perfil: Quiero ayudar':'Perfil: Necesito ayuda')+' · '+esc(me.alias)+'</div></div><button class="btn ghost small" data-act="onb">Cambiar perfil</button></div>'
     +'<div class="grid kpis" style="margin-bottom:16px">'+kpi('Personas ayudando cerca',helpersNear,'En tu sector y los vecinos')+kpi('Solicitudes abiertas cerca',openNear,'Sin nombres: solo hogar, sector y urgencia')+kpi('Ayudas resueltas',doneAll,'Confirmadas por quien las recibió','ok')+'</div>';
   let body='';
   if(me.role==='ayuda'){
@@ -474,7 +513,7 @@ function vRed(){
 function openOnb(role){
   const m=$('#modal');
   if(!role){
-    m.innerHTML='<div class="overlay" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><div><h2 id="mt">Bienvenido a NODUS</h2><div class="muted" style="font-size:13px">Elige cómo participas. Te conectamos con tu red más cercana para actuar rápido.</div></div>'
+    m.innerHTML='<div class="overlay" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><div><h2 id="mt">¿Cómo quieres participar?</h2></div>'
       +'<div class="roles"><button type="button" class="role" data-act="pickRole" data-role="ayuda"><b>Quiero ayudar</b><span class="muted">Voluntaria, vecino, transportista, profesional o proveedor.</span></button><button type="button" class="role" data-act="pickRole" data-role="necesito"><b>Necesito ayuda</b><span class="muted">Tu hogar o comunidad necesita agua, salud, comida, refugio o apoyo.</span></button></div>'
       +'<button type="button" class="btn ghost" data-act="closeModal">Explorar primero</button></div></div>';
     return;
@@ -543,7 +582,7 @@ function vMotor(){
   const R=runMatching(),open=R.open,M=R.matches,G=R.gaps;
   const by=(keys,f)=>keys.map(k=>[k[1],open.filter(r=>f(r)===k[0]).length]);
   const avg=M.length?Math.round(M.reduce((a,x)=>a+x.sc.total,0)/M.length):0;
-  const head='<div class="card-h"><div><h2>Motor de correspondencia</h2><div class="muted" style="font-size:13px">Analiza cada solicitud abierta (qué, dónde, cuándo y urgencia) y propone la mejor persona de la red. Coordinación aprueba; el motor nunca asigna solo.</div></div></div>'
+  const head='<div class="card-h"><div><h2>Coordinación</h2><div class="muted" style="font-size:13px">NODUS propone quién ayuda a quién. Una persona de coordinación aprueba cada asignación.</div></div></div>'
     +'<div class="grid kpis" style="margin-bottom:16px">'+kpi('Solicitudes abiertas',open.length,'Pendientes de ayuda')+kpi('Con propuesta',M.length,'Puntuación media '+avg+'/100','ok')+kpi('Sin cubrir',G.length,'Brechas de la red',G.length?'crit':'')+'</div>';
   const an='<h3 style="margin:0 0 10px">Análisis de la demanda</h3><div class="grid two" style="margin-bottom:20px">'
     +bars('Qué se necesita',Object.keys(RNEED).map(k=>[RNEED[k],open.filter(r=>r.type===k).length]).filter(x=>x[1]))
@@ -638,48 +677,69 @@ function selPanel(){
 }
 
 /* ---------- vistas ---------- */
+const PRINCIPLES=[
+  ['Primero lo que falta','Los campamentos publican sus necesidades y la ayuda responde a eso, no a lo que sobra.'],
+  ['Dinero antes que bultos','Comprar cerca es más rápido y no satura los acopios. El dinero se registra en el libro público.'],
+  ['Cada lote con QR','Cada vez que un lote cambia de manos se escanea el QR. Así siempre se sabe dónde está.'],
+  ['Cuentas abiertas','Cualquiera puede ver los ingresos, las compras y las entregas. Si alguien altera un registro, se detecta.'],
+  ['Dignidad y privacidad','Quien recibe ayuda no aparece con nombre. Solo se muestran su sector y su urgencia.']
+];
+const NGOS=[
+  {n:'Cruz Roja Venezolana',tags:['Salud','Agua potable','Apoyo psicosocial'],t:'Más de 6.000 familias (unas 24.000 personas) atendidas en La Guaira a los tres meses, con servicios en cuatro parroquias.',src:'El Nacional, sep 2026',u:'https://www.elnacional.com/2026/09/cruz-roja-venezolana-asiste-24000-damnificados-la-guaira-2026/'},
+  {n:'Grupo de Rescate Venezuela',tags:['Rescate','Refugio','Distribución'],t:'25 días de operaciones. Entregó carpas, pañales, insumos médicos, comida no perecedera y agua a familias censadas. Publica su rendición de cuentas.',src:'GRV',u:'https://grupoderescatevenezuela.org/blog/terremoto-la-guaira-2026-operaciones-grv'},
+  {n:'Ayuda en Acción',tags:['Recaudación','Ayuda a familias'],t:'Recoge donaciones para las personas afectadas y trabaja en La Guaira.',src:'Ayuda en Acción',u:'https://ayudaenaccion.org/blog/ayuda-humanitaria/terremotos-venezuela/'},
+  {n:'Olvidados',tags:['Atención médica'],t:'ONG española que da atención médica en un refugio de La Guaira.',src:'El Diario / EFE, ago 2026',u:'https://eldiario.com/2026/08/24/ayuda-humanitaria-venezuela-10/'},
+  {n:'Naciones Unidas',tags:['Coordinación internacional'],t:'Intensificó la respuesta internacional desde los primeros días tras los sismos.',src:'Noticias ONU, jun 2026',u:'https://news.un.org/es/story/2026/06/1541620'}
+];
+const lnk=(u,t)=>'<a href="'+u+'" target="_blank" rel="noopener">'+t+'</a>';
 function vResumen(){
   const V=verify(),T2=totals(),C=coverage(),active=state.lots.filter(l=>l.stage<3).length,fly=state.lots.filter(l=>l.stage===2).length;
-  const rows=Object.keys(CATS).map(k=>{let req=0,del=0,f=0;state.needs.filter(n=>n.cat===k).forEach(n=>{const s=stats(n);req+=n.req*n.cost;del+=s.del*n.cost;f+=s.fly*n.cost;});return {k,req,del,f};});
-  const max=Math.max.apply(null,rows.map(r=>r.req))||1;
-  const last=state.ledger.slice(-6).reverse();
   return '<div class="grid kpis">'
-    +kpi('Fondos recibidos',usd(T2.recv),usd(T2.spent)+' gastados · '+usd(T2.saldo)+' sin asignar')
-    +kpi('Cobertura entregada',C.pct+'%',usd(C.del)+' entregados de '+usd(C.req)+' requeridos')
-    +kpi('Lotes en curso',active,fly+' en tránsito ahora')
-    +kpi('Libro de fondos',V.ok?'Íntegro':'Alterado',V.ok?state.ledger.length+' registros verificados':'Falla en el registro #'+V.first,V.ok?'ok':'crit')
+    +kpi('Fondos recibidos',usd(T2.recv),usd(T2.spent)+' ya invertidos')
+    +kpi('Necesidad cubierta',C.pct+'%','Entregado y confirmado')
+    +kpi('Lotes en camino',active,fly+' en tránsito ahora')
+    +kpi('Cuentas',V.ok?'Íntegras':'Alteradas',V.ok?state.ledger.length+' registros verificados':'Fallo en el registro #'+V.first,V.ok?'ok':'crit')
     +'</div>'
     +'<div class="grid two" style="margin-top:16px">'
-    +'<div class="card mapwrap"><div class="card-h"><div><h2>Mapa de la respuesta</h2><div class="muted" style="font-size:13px">Pulsa un campamento o un centro de acopio. El color indica la necesidad abierta más urgente.</div></div></div>'+mapSVG()
-    +'<div class="maplegend"><span>■ Campamento con necesidad crítica (rojo), alta (ámbar) o cubierto (verde)</span><span>◯ Centro de acopio</span><span>┅ Lote en tránsito</span></div></div>'
+    +'<div class="card mapwrap"><div class="card-h"><h2>Mapa de la respuesta</h2></div>'+mapSVG()
+    +'<div class="maplegend"><span style="color:var(--crit)">■ Crítico</span><span style="color:var(--warn)">■ Alto</span><span style="color:var(--ok)">■ Cubierto</span><span>◯ Acopio</span><span>┅ En tránsito</span></div></div>'
     +'<div class="card" id="selPanel">'+selPanel()+'</div></div>'
-    +'<div class="grid even" style="margin-top:16px">'
-    +'<div class="card"><div class="card-h"><div><h2>Valor de la ayuda por categoría</h2><div class="muted" style="font-size:13px">A costo unitario de referencia, frente a lo requerido.</div></div></div>'
-    +rows.map(r=>'<div class="catrow"><div><b>'+CATS[r.k]+'</b></div><div><div style="width:'+(r.req/max*100)+'%">'+bar(r.del,r.f,r.req,CATS[r.k]+': '+usd(r.del)+' entregados, '+usd(r.f)+' en proceso de '+usd(r.req))+'</div><div class="v">'+usd(r.del)+' entregados · '+usd(r.f)+' en proceso · '+usd(r.req)+' requeridos</div></div></div>').join('')
-    +legend()+'</div>'
-    +'<div class="card"><div class="card-h"><div><h2>Últimos movimientos</h2><div class="muted" style="font-size:13px">Visibles para cualquier persona. Sin datos de beneficiarios.</div></div><button class="btn ghost small" data-act="go" data-tab="fondos">Abrir libro</button></div>'
-    +'<ul style="list-style:none;margin:0;padding:0;display:grid;gap:8px">'+last.map(e=>'<li style="display:grid;grid-template-columns:auto 1fr;gap:10px;font-size:13px"><span class="t '+TYPE[e.type][1]+'" style="align-self:start">'+TYPE[e.type][0]+'</span><span>'+esc(e.detail)+'<br><span class="mono muted" style="font-size:11px">#'+e.i+' · '+fdate(e.ts)+' · '+e.hash.slice(0,10)+'…</span></span></li>').join('')+'</ul></div>'
-    +'</div>'
-    +'<section class="card flat" style="margin-top:16px"><div class="card-h"><div><h2>Por qué La Guaira</h2><div class="muted" style="font-size:13px">Contexto real, con sus fuentes. Los datos de la demostración son simulados.</div></div></div><div class="ctx">'
-    +'<blockquote>10.981 personas alojadas en 28 campamentos de La Guaira, el estado con más personas atendidas (cifras oficiales al 12 de julio de 2026).<cite><a href="https://www.vanguardia.com/mundo/2026/07/12/terremoto-en-venezuela-aumentan-a-94-los-campamentos-para-atender-a-mas-de-18000-damnificados/" target="_blank" rel="noopener">Vanguardia / EFE</a></cite></blockquote>'
-    +'<blockquote>La Guaira llegó a tener unos 32 centros de acopio registrados; muchos han cesado sus operaciones.<cite><a href="https://eldiario.com/2026/08/29/ayuda-la-guaira-terremotos/" target="_blank" rel="noopener">El Diario, 29 ago 2026</a></cite></blockquote>'
-    +'<blockquote>ONG con presencia en La Guaira alertaron de que la ayuda internacional ha bajado a dos meses del terremoto.<cite><a href="https://eldiario.com/2026/08/24/ayuda-humanitaria-venezuela-10/" target="_blank" rel="noopener">El Diario / EFE, 24 ago 2026</a></cite></blockquote>'
-    +'<blockquote>Damnificados en albergues de La Guaira denunciaron que la distribución de la ayuda no ha sido equitativa.<cite><a href="https://www.elsalvador.com/?p=1281317" target="_blank" rel="noopener">AFP vía elsalvador.com</a></cite></blockquote>'
-    +'</div></section>';
+
+    +'<div class="section-h"><h2>Así deberían gestionarse los recursos</h2><p>Cinco reglas que NODUS aplica a cada insumo y a cada dólar.</p></div>'
+    +'<div class="principles">'+PRINCIPLES.map((p,i)=>'<div class="principle"><span class="n">0'+(i+1)+'</span><b>'+p[0]+'</b><p>'+p[1]+'</p></div>').join('')+'</div>'
+
+    +'<div class="section-h"><h2>Quién respondió en La Guaira</h2><p>Principales organizaciones y sus líneas de actuación, según fuentes públicas.</p></div>'
+    +'<div class="ngos">'+NGOS.map(o=>'<article class="ngo"><h3>'+o.n+'</h3><div class="chips">'+o.tags.map(t=>'<span class="pill">'+t+'</span>').join('')+'</div><p>'+o.t+'</p><cite>Fuente: '+lnk(o.u,o.src)+'</cite></article>').join('')+'</div>'
+    +'<p class="muted" style="font-size:13px;margin:10px 0 0">Contexto: 10.981 personas en 28 campamentos de La Guaira ('+lnk('https://www.vanguardia.com/mundo/2026/07/12/terremoto-en-venezuela-aumentan-a-94-los-campamentos-para-atender-a-mas-de-18000-damnificados/','EFE, 12 jul')+'). Hubo unos 32 centros de acopio y muchos cerraron ('+lnk('https://eldiario.com/2026/08/29/ayuda-la-guaira-terremotos/','El Diario, 29 ago')+'). A los dos meses, la ayuda internacional había bajado y seguían faltando agua, higiene y suministros médicos ('+lnk('https://eldiario.com/2026/08/24/ayuda-humanitaria-venezuela-10/','EFE, 24 ago')+').</p>'
+
+    +'<div class="section-h"><h2>Dona por líneas seguras</h2></div>'
+    +'<section class="safe"><div><ul>'
+    +'<li>Dona a organizaciones registradas que publican en qué gastan el dinero.</li>'
+    +'<li>Comprueba la cuenta bancaria en la web oficial, escribiendo tú la dirección en el navegador.</li>'
+    +'<li>Mejor dinero que bultos: así se compra cerca justo lo que falta.</li>'
+    +'<li>Lleva insumos solo si un centro de acopio publicó que los necesita.</li>'
+    +'<li class="no">No transfieras a cuentas personales ni a enlaces que lleguen por WhatsApp o redes.</li>'
+    +'<li class="no">No envíes ropa usada ni artículos que nadie pidió: ocupan espacio en los acopios.</li>'
+    +'</ul></div><div class="chan"><b>Canales oficiales</b>'
+    +'<span>Cruz Roja: '+lnk('https://www.ifrc.org','ifrc.org')+' (Federación Internacional)</span>'
+    +'<span>Grupo de Rescate Venezuela: '+lnk('https://grupoderescatevenezuela.org','grupoderescatevenezuela.org')+'</span>'
+    +'<span>Ayuda en Acción: '+lnk('https://ayudaenaccion.org','ayudaenaccion.org')+'</span>'
+    +'<span class="muted" style="font-size:13px">En NODUS, cada aporte queda en el libro público y se puede seguir hasta su entrega.</span>'
+    +'<button class="btn" data-act="go" data-tab="necesidades">Ver qué falta ahora</button></div></section>';
 }
 
 function needCard(n){
   const s=stats(n),c=camp(n.campId);
   return '<article class="card need" id="need-'+n.id+'"><div class="top"><div><h3>'+esc(n.item)+'</h3><div class="muted" style="font-size:13px">'+esc(c.name)+' · '+esc(CATS[n.cat])+'</div></div><div class="chips">'+(n.cold?'<span class="pill cold">Cadena de frío</span>':'')+priPill(n.pri)+'</div></div>'
     +bar(s.del,s.fly,n.req,n.item+': '+s.del+' entregados, '+s.fly+' en proceso, faltan '+s.miss)
-    +'<div class="meta"><span>Entregado <b>'+num(s.del)+'</b></span><span>En proceso <b>'+num(s.fly)+'</b></span><span>Falta <b>'+num(s.miss)+'</b> de '+num(n.req)+' '+esc(n.unit)+'</span><span>Ref. '+usd(n.cost)+' por unidad</span></div>'
-    +'<div>'+(s.miss>0?'<button class="btn small" data-act="cover" data-id="'+n.id+'">Cubrir esta necesidad</button>':'<span class="pill ok">Necesidad cubierta</span>')+'</div></article>';
+    +'<div class="meta"><span>Entregado <b>'+num(s.del)+'</b></span><span>En proceso <b>'+num(s.fly)+'</b></span><span>Falta <b>'+num(s.miss)+'</b> de '+num(n.req)+' '+esc(n.unit)+'</span></div>'
+    +'<div>'+(s.miss>0?'<button class="btn small" data-act="cover" data-id="'+n.id+'">Cubrir</button>':'<span class="pill ok">Necesidad cubierta</span>')+'</div></article>';
 }
 function vNecesidades(){
   const list=state.needs.filter(n=>(ui.fCat==='all'||n.cat===ui.fCat)&&(ui.fPri==='all'||n.pri===ui.fPri)&&(ui.fCamp==='all'||n.campId===ui.fCamp))
     .sort((a,b)=>(stats(a).miss===0)-(stats(b).miss===0)||PRI[a.pri].rank-PRI[b.pri].rank||stats(b).miss*b.cost-stats(a).miss*a.cost);
   const chip=(k,v,cur,l)=>'<button class="chip" data-act="'+k+'" data-v="'+v+'" aria-pressed="'+(cur===v)+'">'+l+'</button>';
-  return '<div class="card-h"><div><h2>Necesidades publicadas por los campamentos</h2><div class="muted" style="font-size:13px">Los donantes responden a lo que falta de verdad, en lugar de enviar lo que sobra.</div></div></div>'
+  return '<div class="card-h"><h2>Qué falta en los campamentos</h2></div>'
     +'<div class="filters"><div class="chips" role="group" aria-label="Categoría">'+chip('fCat','all',ui.fCat,'Todas')+Object.keys(CATS).map(k=>chip('fCat',k,ui.fCat,CATS[k])).join('')+'</div>'
     +'<div class="chips" role="group" aria-label="Prioridad">'+chip('fPri','all',ui.fPri,'Toda prioridad')+['critica','alta','media'].map(k=>chip('fPri',k,ui.fPri,PRI[k].label)).join('')+'</div>'
     +'<label style="display:flex;align-items:center;gap:8px;font-weight:500" for="fCamp">Campamento <select id="fCamp" data-change="fCamp" style="width:auto"><option value="all">Todos</option>'+camps.map(c=>'<option value="'+c.id+'"'+(ui.fCamp===c.id?' selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select></label></div>'
@@ -714,7 +774,7 @@ function vAcopio(){
   const f=ui.fLot;
   const lots=state.lots.filter(l=>f==='todos'||(f==='curso'?l.stage<3:l.stage===3)).slice().sort((a,b)=>(b.times[b.stage]||0)-(a.times[a.stage]||0));
   const chip=(v,l)=>'<button class="chip" data-act="fLot" data-v="'+v+'" aria-pressed="'+(f===v)+'">'+l+'</button>';
-  return '<div class="card-h"><div><h2>Centros de acopio y lotes con QR</h2><div class="muted" style="font-size:13px">Cada lote cambia de custodia con un escaneo. Cada escaneo queda en el libro.</div></div></div>'
+  return '<div class="card-h"><h2>Centros de acopio y lotes</h2></div>'
     +'<div class="grid even" style="margin-bottom:20px">'+hubs.map(h=>{const inv=state.lots.filter(l=>l.hubId===h.id&&l.stage===1);const units=inv.reduce((a,l)=>a+l.qty,0);
       return '<div class="card"><div class="card-h" style="margin-bottom:8px"><div><h3>'+h.code+' · '+esc(h.name)+'</h3><div class="muted" style="font-size:13px">'+inv.length+' '+pl(inv.length,'lote','lotes')+' · '+num(units)+' unidades en inventario</div></div><span class="pill '+h.status+'">'+(h.status==='abierto'?'Abierto':'Cupo limitado')+'</span></div><div class="chips">'+h.accepts.map(a=>'<span class="pill">'+CATS[a]+'</span>').join('')+(h.cold?'<span class="pill cold">Cadena de frío</span>':'')+'</div></div>';}).join('')+'</div>'
     +'<div class="filters"><div class="chips" role="group" aria-label="Estado del lote">'+chip('curso','En curso')+chip('entregados','Entregados')+chip('todos','Todos')+'</div><span class="muted" style="font-size:13px">'+lots.length+' '+pl(lots.length,'lote','lotes')+'</span></div>'
@@ -731,8 +791,8 @@ function vFondos(){
     const t=TYPE[e.type],val=e.amount!=null?usd(e.amount):(e.qty!=null?num(e.qty)+' '+esc(e.unit||''):'');
     return '<tr class="'+(badSet[e.i]?'bad':'')+'"><td class="mono">#'+e.i+'</td><td>'+fdate(e.ts)+'</td><td><span class="t '+t[1]+'">'+t[0]+'</span></td><td>'+esc(e.actor)+'</td><td>'+esc(e.detail)+(badSet[e.i]?'<br><b style="color:var(--crit)">⚠ '+(badSet[e.i]==='contenido'?'El hash no coincide con el contenido':'No enlaza con el registro anterior')+'</b>':'')+'</td><td class="num">'+val+'</td><td class="h">'+e.hash.slice(0,12)+'…<br>← '+e.prev.slice(0,8)+'…</td></tr>';
   }).join('');
-  return '<div class="grid kpis" style="margin-bottom:16px">'+kpi('Recibido',usd(T2.recv),'Donaciones con y sin destino')+kpi('Gastado en compras',usd(T2.spent),'Proveedores locales verificados')+kpi('Saldo sin asignar',usd(T2.saldo),'Visible para donantes y auditoría')+'</div>'
-    +'<div class="grid two"><div><div class="card-h"><div><h2>Libro de fondos y de especie</h2><div class="muted" style="font-size:13px">Registro de solo añadir. Cada fila incluye el hash del registro anterior. No contiene datos personales de beneficiarios; los donantes aparecen con seudónimo salvo que elijan mostrar su nombre.</div></div></div>'
+  return '<div class="grid kpis" style="margin-bottom:16px">'+kpi('Recibido',usd(T2.recv),'Todas las donaciones')+kpi('Invertido',usd(T2.spent),'Compras locales')+kpi('Por asignar',usd(T2.saldo),'Saldo disponible')+'</div>'
+    +'<div class="grid two"><div><div class="card-h"><div><h2>Libro público</h2></div></div>'
     +banner
     +'<div class="actions" style="margin-bottom:12px"><button class="btn small" data-act="verify">Recalcular y verificar</button><button class="btn ghost small" data-act="tamper1"'+(ui.tamper?' disabled':'')+'>Simular alteración de un monto</button><button class="btn ghost small" data-act="tamper2"'+(ui.tamper?' disabled':'')+'>Alterar y recalcular el hash</button>'+(ui.tamper?'<button class="btn ghost small" data-act="restore">Restaurar</button>':'')+'</div>'
     +'<div class="tablewrap" tabindex="0" aria-label="Libro de fondos"><table><thead><tr><th>#</th><th>Fecha</th><th>Tipo</th><th>Actor</th><th>Detalle</th><th style="text-align:right">Monto / cant.</th><th>Hash ← previo</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'
@@ -741,13 +801,13 @@ function vFondos(){
     +'<label for="g-name">Tu nombre<input id="g-name" name="donor" type="text" maxlength="40" placeholder="Opcional"></label>'
     +'<label class="chk" for="g-pub"><input id="g-pub" name="pub" type="checkbox"> Mostrar mi nombre en el libro público</label>'
     +'<button class="btn" type="submit">Registrar en el libro</button></form>'
-    +'<p class="muted" style="font-size:13px;margin:12px 0 0">El saldo general se asigna después a necesidades concretas, y esa asignación también queda registrada.</p></aside></div>';
+    +'</aside></div>';
 }
 
 /* ---------- render y eventos ---------- */
-const TABS=[['resumen','Resumen'],['necesidades','Necesidades'],['acopio','Acopio y lotes'],['fondos','Libro de fondos'],['red','Mi red'],['motor','Motor de ayuda']];
+const TABS=[['resumen','Inicio'],['necesidades','Qué falta'],['acopio','Lotes y QR'],['fondos','Cuentas claras'],['red','Mi red'],['motor','Coordinación']];
 function render(){
-  $('#tabs').innerHTML=TABS.map((t,i)=>'<button class="tab" role="tab" id="tab-'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'" data-act="go" data-tab="'+t[0]+'"><small>'+(i+1)+'</small>'+t[1]+'</button>').join('');
+  $('#tabs').innerHTML=TABS.map((t,i)=>'<button class="tab" role="tab" id="tab-'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'" data-act="go" data-tab="'+t[0]+'">'+t[1]+'</button>').join('');
   const v={resumen:vResumen,necesidades:vNecesidades,acopio:vAcopio,fondos:vFondos,red:vRed,motor:vMotor}[ui.tab];
   $('#meChip').textContent=ui.me?(ui.me.role==='ayuda'?'Quiero ayudar':'Necesito ayuda')+' · '+ui.me.sector:'Elegir perfil';
   const view=$('#view');view.setAttribute('role','tabpanel');view.setAttribute('aria-labelledby','tab-'+ui.tab);view.innerHTML=v();
@@ -814,7 +874,7 @@ function doTamper(recalc){
 function undoTamper(){
   if(!ui.tamper)return;const e=state.ledger[ui.tamper.i];e.amount=ui.tamper.amount;e.hash=ui.tamper.hash;ui.tamper=null;render();toast('Registro restaurado');
 }
-function capt(step,total,text){$('#demoStep').textContent='PASO '+step+' DE '+total;$('#demoText').textContent=text;}
+function capt(step,total,text){$('#demoBox').hidden=false;$('#demoStep').textContent='PASO '+step+' DE '+total;$('#demoText').textContent=text;}
 async function demo(){
   if(ui.demo)return;ui.demo=true;const btn=$('#demoBtn');btn.disabled=true;
   try{
@@ -831,7 +891,7 @@ async function demo(){
     capt(5,TOT,'El campamento confirma la recepción. La necesidad se actualiza al instante.');scanLot(l.id);render();flashEl('lot-'+l.id);await sleep(2400);
     capt(6,TOT,'El libro de fondos guarda cada paso con hash encadenado. Cualquier alteración se detecta.');go('fondos');await sleep(600);
     toast('Entrega completa registrada y verificada');
-  }finally{ui.demo=false;btn.disabled=false;}
+  }finally{ui.demo=false;btn.disabled=false;setTimeout(()=>{if(!ui.demo)$('#demoBox').hidden=true;},4000);}
 }
 
 const ACT={
@@ -879,7 +939,6 @@ window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h!==
 seed();seedNet();
 try{const h=location.hash.slice(1);if(TABS.some(t=>t[0]===h))ui.tab=h;}catch(_){}
 render();
-openOnb();
 })();
 </script>
 </body>
