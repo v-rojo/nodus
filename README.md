@@ -10,11 +10,8 @@ Abre `index.html` en el navegador, o sirve la carpeta:
 python3 -m http.server 8000
 ```
 
-## Deploy en GitHub Pages
+## Publicación
 
-1. Sube el código a la rama `main`.
-2. En GitHub: **Settings → Pages → Build and deployment → Source: GitHub Actions**.
-3. Cada push a `main` publica el sitio con `.github/workflows/deploy.yml`
-   (también se puede lanzar a mano desde la pestaña **Actions**).
-
-La URL quedará como `https://<usuario>.github.io/nodus/`.
+GitHub Pages publica el sitio directamente desde la rama `main` (carpeta raíz).
+Cada cambio que llega a `main` se publica solo en uno o dos minutos en
+https://v-rojo.github.io/nodus/
