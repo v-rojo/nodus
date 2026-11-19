@@ -84,6 +84,9 @@ h3{font:700 16px/1.25 var(--display);margin:0}
 .safe li{display:grid;grid-template-columns:22px 1fr;gap:6px}
 .safe li:before{content:"✓";color:var(--ok);font-weight:700}
 .safe li.no:before{content:"✕";color:var(--crit)}
+.optgroup{display:grid;gap:8px}.optlabel{font:600 12px var(--mono);color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em}
+.givebar{display:flex;gap:10px 14px;align-items:center;flex-wrap:wrap;padding:10px 14px;border:1px solid var(--accent);background:var(--accent-soft);border-radius:10px;margin-bottom:14px;font-size:14px}
+.givebar>span:first-child{font-weight:700}
 .safe .chan{background:var(--surface);border-radius:10px;padding:12px 14px;display:grid;gap:8px;font-size:14px;align-content:start}
 .demo-box .step{font:500 12px var(--mono);color:var(--accent);margin-bottom:4px}
 .demo-box p{margin:0}
@@ -252,7 +255,7 @@ footer{padding:20px 0 40px;color:var(--ink-2);font-size:13px;border-top:1px soli
     </div>
     <div class="rolecards">
       <button class="rolecard" data-act="pickRole" data-role="ayuda"><span class="ic ic-help" aria-hidden="true">♥</span><b>Quiero ayudar</b><span>Dona, lleva insumos o súmate como voluntario</span></button>
-      <button class="rolecard" data-act="pickRole" data-role="necesito"><span class="ic ic-need" aria-hidden="true">✚</span><b>Necesito ayuda</b><span>Agua, salud, comida o refugio cerca de ti</span></button>
+      <button class="rolecard" data-act="pickRole" data-role="necesito"><span class="ic ic-need" aria-hidden="true">✚</span><b>Necesito ayuda</b><span>Recursos, voluntarios o servicios: psicología, jurídica, transporte</span></button>
       <button class="rolecard ghost" id="demoBtn" data-act="demo"><span class="ic ic-demo" aria-hidden="true">▶</span><b>Ver una entrega en 1 minuto</b><span>Del pedido del campamento a la entrega confirmada</span></button>
     </div>
   </section>
@@ -365,7 +368,7 @@ const DEMO_NEEDS=[
 /* ---------- estado y libro ---------- */
 const GENESIS='0'.repeat(64);
 const state={needs:[],lots:[],ledger:[],members:[],requests:[]};
-const ui={tab:'resumen',sel:{kind:'camp',id:'cn'},fCat:'all',fPri:'all',fCamp:'all',fLot:'curso',chain:{},demo:false,demoN:0,tamper:null,me:null};
+const ui={give:null,tab:'resumen',sel:{kind:'camp',id:'cn'},fCat:'all',fPri:'all',fCamp:'all',fLot:'curso',chain:{},demo:false,demoN:0,tamper:null,me:null};
 let T=null;const now=()=>T===null?Date.now():T;
 
 const camp=id=>camps.find(c=>c.id===id);
@@ -447,8 +450,8 @@ function seed(){
 /* ---------- perfiles y red por cercanía ---------- */
 const SECTORS=['Playa Grande','Maiquetía','La Guaira','Macuto','Caraballeda','Naiguatá'];
 const HUB_SECTOR={mq:'Maiquetía',lg:'La Guaira',cr:'Caraballeda'};
-const SKILLS={transporte:'Transporte',salud:'Salud',agua:'Agua y saneamiento',alimentos:'Alimentos',psicosocial:'Apoyo psicosocial',almacen:'Acopio y almacén'};
-const RNEED={agua:'Agua potable',salud:'Salud',higiene:'Higiene',alimentos:'Alimentos',refugio:'Refugio',psicosocial:'Apoyo psicosocial'};
+const SKILLS={transporte:'Transporte',salud:'Salud',agua:'Agua y saneamiento',alimentos:'Alimentos',psicosocial:'Psicología',juridica:'Asesoría jurídica',manos:'Limpieza y reparaciones',cuidado:'Cuidado de niños y mayores',almacen:'Acopio y almacén'};
+const RNEED={agua:'Agua potable',alimentos:'Alimentos',higiene:'Higiene',salud:'Salud y medicinas',refugio:'Refugio',manos:'Limpieza y reparaciones',cuidado:'Cuidado de niños y mayores',psicosocial:'Psicología',juridica:'Asesoría jurídica',transporte:'Transporte'};
 const dist=(a,b)=>Math.abs(SECTORS.indexOf(a)-SECTORS.indexOf(b));
 const band=d=>d===0?'Tu sector':d===1?'Sector vecino':'A '+d+' sectores';
 const pseudo=(p,s)=>p+' #'+sha256(String(s).toLowerCase()).slice(0,4).toUpperCase();
@@ -472,14 +475,14 @@ function resolveRequest(rid){
   return true;
 }
 function seedNet(){
-  [['Voluntaria Ana','La Guaira',['salud','psicosocial'],'Hoy'],['Transportista Luis','Maiquetía',['transporte'],'Hoy'],['Vecino Pedro','Macuto',['agua','almacen'],'Esta semana'],['Enfermera Marta','Caraballeda',['salud'],'Hoy'],['Cooperativa Litoral','Naiguatá',['alimentos','almacen'],'Esta semana'],['Voluntario José','Playa Grande',['transporte','agua'],'Hoy'],['Psicóloga Elena','La Guaira',['psicosocial'],'Esta semana'],['Vecina Rosa','Macuto',['alimentos'],'Hoy']]
+  [['Voluntaria Ana','La Guaira',['salud','psicosocial'],'Hoy'],['Transportista Luis','Maiquetía',['transporte'],'Hoy'],['Vecino Pedro','Macuto',['agua','almacen'],'Esta semana'],['Enfermera Marta','Caraballeda',['salud'],'Hoy'],['Cooperativa Litoral','Naiguatá',['alimentos','almacen'],'Esta semana'],['Voluntario José','Playa Grande',['transporte','agua'],'Hoy'],['Psicóloga Elena','La Guaira',['psicosocial'],'Esta semana'],['Vecina Rosa','Macuto',['alimentos','cuidado'],'Hoy'],['Abogada Carmen','La Guaira',['juridica'],'Esta semana'],['Brigada Juvenil','Caraballeda',['manos','transporte'],'Hoy']]
     .forEach((m,i)=>state.members.push({id:'m'+(i+1),alias:m[0],sector:m[1],skills:m[2],avail:m[3]}));
-  [['Macuto','agua','critica',5,'abierta'],['La Guaira','salud','alta',3,'abierta'],['Caraballeda','alimentos','media',4,'en camino','Enfermera Marta'],['Naiguatá','psicosocial','alta',6,'abierta'],['Maiquetía','higiene','media',2,'resuelta','Transportista Luis']]
+  [['Macuto','agua','critica',5,'abierta'],['La Guaira','salud','alta',3,'abierta'],['Caraballeda','alimentos','media',4,'en camino','Enfermera Marta'],['Naiguatá','psicosocial','alta',6,'abierta'],['Maiquetía','higiene','media',2,'resuelta','Transportista Luis'],['La Guaira','juridica','media',4,'abierta'],['Playa Grande','transporte','alta',2,'abierta'],['Macuto','manos','alta',5,'abierta']]
     .forEach(r=>addRequest({sector:r[0],type:r[1],urg:r[2],size:r[3],status:r[4],helper:r[5]||null,alias:'seed'}));
 }
 function reqCard(r){
   const me=ui.me,d=me?dist(me.sector,r.sector):0;
-  const match=me&&me.role==='ayuda'&&(me.skills.includes(r.type)||(r.type==='higiene'&&me.skills.includes('almacen'))||(me.skills.includes('transporte')&&['agua','alimentos','higiene','refugio'].includes(r.type)));
+  const match=me&&me.role==='ayuda'&&!!scoreMatch(r,{skills:me.skills,sector:me.sector,avail:'Hoy'});
   const stCls=r.status==='resuelta'?'ok':r.status==='en camino'?'cold':'';
   return '<article class="card need" id="req-'+r.id+'"><div class="top"><div><h3>'+RNEED[r.type]+' · '+esc(r.sector)+'</h3><div class="muted" style="font-size:13px">'+esc(r.by)+' · hogar de '+r.size+' '+pl(r.size,'persona','personas')+(me?' · '+band(d):'')+'</div></div><div class="chips">'+(match?'<span class="pill cold">Coincide contigo</span>':'')+priPill(r.urg)+'<span class="pill">Para: '+r.when+'</span></div></div>'
     +'<div class="meta"><span class="pill '+stCls+'">'+(r.status==='abierta'?'Abierta':r.status==='en camino'?'Ayuda en camino':'Resuelta')+'</span>'+(r.helper?'<span>con <b>'+esc(r.helper)+'</b></span>':'')+'</div>'
@@ -500,7 +503,7 @@ function vRed(){
     body='<h3 style="margin:0 0 10px">Solicitudes cerca de ti</h3><div class="need-list">'+(open.length?open.map(reqCard).join(''):'<div class="empty">No hay solicitudes abiertas.</div>')+'</div>';
   }else{
     const mine=reqs.find(r=>r.id===me.requestId);
-    const skillNeed={agua:['agua'],salud:['salud'],higiene:['almacen'],alimentos:['alimentos'],refugio:['almacen'],psicosocial:['psicosocial']};
+    const skillNeed=PRIMARY;
     const helpers=mem.slice().sort((a,b)=>dist(me.sector,a.sector)-dist(me.sector,b.sector)||((mine&&(skillNeed[mine.type]||[]).some(k=>b.skills.includes(k)))-(mine&&(skillNeed[mine.type]||[]).some(k=>a.skills.includes(k)))));
     const pts=camps.map(c=>({n:c.name,d:dist(me.sector,c.sector),k:'Campamento'})).concat(hubs.map(h=>({n:h.name,d:dist(me.sector,HUB_SECTOR[h.id]),k:'Acopio'}))).sort((a,b)=>a.d-b.d).slice(0,4);
     body='<div class="grid two"><div>'
@@ -510,21 +513,55 @@ function vRed(){
   }
   return head+body+'<h3 style="margin:24px 0 10px">Comunidad por sector</h3>'+strip;
 }
-function openOnb(role){
+const NEED_GROUPS={
+  recursos:{l:'Recursos',d:'Agua, alimentos, higiene, medicinas o refugio',types:['agua','alimentos','higiene','salud','refugio']},
+  voluntariado:{l:'Voluntariado',d:'Manos para limpiar, reparar o cuidar',types:['manos','cuidado']},
+  servicios:{l:'Servicios',d:'Psicología, asesoría jurídica o transporte',types:['psicosocial','juridica','transporte']}
+};
+function pathCard(role,path,ic,cls,title,desc){
+  return '<button type="button" class="rolecard" data-act="pickPath" data-role="'+role+'" data-path="'+path+'"><span class="ic '+cls+'" aria-hidden="true">'+ic+'</span><b>'+title+'</b><span>'+desc+'</span></button>';
+}
+function openOnb(role,path){
   const m=$('#modal');
+  const shell=(inner,back)=>'<div class="overlay" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt">'+inner+'<div class="actions" style="justify-content:flex-end"><button type="button" class="btn ghost" data-act="'+(back?'onb':'closeModal')+'">'+(back?'Atrás':'Explorar primero')+'</button></div></div></div>';
   if(!role){
-    m.innerHTML='<div class="overlay" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><div><h2 id="mt">¿Cómo quieres participar?</h2></div>'
-      +'<div class="roles"><button type="button" class="role" data-act="pickRole" data-role="ayuda"><b>Quiero ayudar</b><span class="muted">Voluntaria, vecino, transportista, profesional o proveedor.</span></button><button type="button" class="role" data-act="pickRole" data-role="necesito"><b>Necesito ayuda</b><span class="muted">Tu hogar o comunidad necesita agua, salud, comida, refugio o apoyo.</span></button></div>'
-      +'<button type="button" class="btn ghost" data-act="closeModal">Explorar primero</button></div></div>';
+    m.innerHTML=shell('<h2 id="mt">¿Cómo quieres participar?</h2><div class="rolecards">'
+      +'<button type="button" class="rolecard" data-act="pickRole" data-role="ayuda"><span class="ic ic-help" aria-hidden="true">♥</span><b>Quiero ayudar</b><span>Con recursos o como voluntario</span></button>'
+      +'<button type="button" class="rolecard" data-act="pickRole" data-role="necesito"><span class="ic ic-need" aria-hidden="true">✚</span><b>Necesito ayuda</b><span>Recursos, voluntarios o servicios</span></button></div>',false);
+    return;
+  }
+  if(!path){
+    m.innerHTML=shell(role==='ayuda'
+      ?'<h2 id="mt">Quiero ayudar</h2><div class="optgroup"><div class="optlabel">1 · Recursos</div><div class="rolecards">'
+        +pathCard('ayuda','dinero','$','ic-help','Donar dinero','Se compra cerca justo lo que falta. Queda en el libro público.')
+        +pathCard('ayuda','insumos','▣','ic-help','Donar insumos','Llevas material a un centro de acopio y el lote recibe su QR.')
+        +'</div></div><div class="optgroup"><div class="optlabel">2 · Voluntariado</div><div class="rolecards">'
+        +pathCard('ayuda','voluntariado','✋','ic-demo','Ser voluntario','Tu tiempo y lo que sabes hacer, cerca de tu sector.')+'</div></div>'
+      :'<h2 id="mt">Necesito ayuda</h2><div class="rolecards">'
+        +pathCard('necesito','recursos','▣','ic-need','Recursos',NEED_GROUPS.recursos.d)
+        +pathCard('necesito','voluntariado','✋','ic-need','Voluntariado',NEED_GROUPS.voluntariado.d)
+        +pathCard('necesito','servicios','☎','ic-need','Servicios',NEED_GROUPS.servicios.d)+'</div>',true);
     return;
   }
   const sec='<label for="ob-sec">¿En qué sector estás?<select id="ob-sec" name="sector">'+SECTORS.map(s=>'<option>'+s+'</option>').join('')+'</select></label>';
   const alias='<label for="ob-alias">'+(role==='ayuda'?'Nombre o alias':'Alias (tu nombre real no se muestra)')+'<input id="ob-alias" name="alias" type="text" maxlength="30" placeholder="Opcional"></label>';
-  const extra=role==='ayuda'
-    ?'<fieldset><legend>¿En qué puedes ayudar?</legend>'+Object.keys(SKILLS).map(k=>'<label class="chk" for="sk-'+k+'"><input id="sk-'+k+'" type="checkbox" name="sk" value="'+k+'"> '+SKILLS[k]+'</label>').join('')+'</fieldset><label for="ob-av">Disponibilidad<select id="ob-av" name="avail"><option>Ahora</option><option selected>Hoy</option><option>Esta semana</option></select></label>'
-    :'<label for="ob-type">¿Qué necesitas?<select id="ob-type" name="type">'+Object.keys(RNEED).map(k=>'<option value="'+k+'">'+RNEED[k]+'</option>').join('')+'</select></label><label for="ob-urg">Urgencia<select id="ob-urg" name="urg"><option value="critica">Crítica</option><option value="alta" selected>Alta</option><option value="media">Media</option></select></label><label for="ob-when">¿Para cuándo?<select id="ob-when" name="when"><option>Ahora</option><option selected>Hoy</option><option>Esta semana</option></select></label><label for="ob-size">Personas en tu hogar<input id="ob-size" name="size" type="number" min="1" max="30" value="3" required></label><label class="chk" for="ob-ok"><input id="ob-ok" type="checkbox" name="ok" required> Acepto que mi solicitud se muestre sin nombre a personas cercanas</label>';
-  m.innerHTML='<div class="overlay" data-act="closeModal"><form class="modal" data-form="onb" data-role="'+role+'" role="dialog" aria-modal="true" aria-labelledby="mt"><div><h2 id="mt">'+(role==='ayuda'?'Quiero ayudar':'Necesito ayuda')+'</h2><div class="muted" style="font-size:13px">'+(role==='ayuda'?'Te mostramos las solicitudes más cercanas a tu sector.':'Tu solicitud llega primero a quienes están más cerca.')+'</div></div>'+alias+sec+extra
-    +'<div class="actions" style="justify-content:flex-end"><button type="button" class="btn ghost" data-act="onb">Atrás</button><button class="btn" type="submit">Entrar a mi red</button></div></form></div>';
+  let title,extra;
+  if(role==='ayuda'){
+    title='Ser voluntario';
+    extra='<fieldset><legend>¿En qué puedes ayudar?</legend>'+Object.keys(SKILLS).map(k=>'<label class="chk" for="sk-'+k+'"><input id="sk-'+k+'" type="checkbox" name="sk" value="'+k+'"> '+SKILLS[k]+'</label>').join('')+'</fieldset><label for="ob-av">Disponibilidad<select id="ob-av" name="avail"><option>Ahora</option><option selected>Hoy</option><option>Esta semana</option></select></label>';
+  }else{
+    const g=NEED_GROUPS[path];title='Necesito '+g.l.toLowerCase();
+    extra='<label for="ob-type">¿Qué necesitas?<select id="ob-type" name="type">'+g.types.map(k=>'<option value="'+k+'">'+RNEED[k]+'</option>').join('')+'</select></label><div class="formgrid" style="margin:0"><label for="ob-urg">Urgencia<select id="ob-urg" name="urg"><option value="critica">Crítica</option><option value="alta" selected>Alta</option><option value="media">Media</option></select></label><label for="ob-when">¿Para cuándo?<select id="ob-when" name="when"><option>Ahora</option><option selected>Hoy</option><option>Esta semana</option></select></label><label for="ob-size">Personas en tu hogar<input id="ob-size" name="size" type="number" min="1" max="30" value="3" required></label></div><label class="chk" for="ob-ok"><input id="ob-ok" type="checkbox" name="ok" required> Acepto que mi solicitud se muestre sin nombre a personas cercanas</label>';
+  }
+  m.innerHTML='<div class="overlay" data-act="closeModal"><form class="modal" data-form="onb" data-role="'+role+'" role="dialog" aria-modal="true" aria-labelledby="mt"><h2 id="mt">'+title+'</h2>'+alias+sec+extra
+    +'<div class="actions" style="justify-content:flex-end"><button type="button" class="btn ghost" data-act="pickRole" data-role="'+role+'">Atrás</button><button class="btn" type="submit">'+(role==='ayuda'?'Entrar a mi red':'Enviar solicitud')+'</button></div></form></div>';
+}
+function pickPath(d){
+  if(d.role==='ayuda'&&(d.path==='dinero'||d.path==='insumos')){
+    ui.give=d.path;$('#modal').innerHTML='';ui.fCat='all';ui.fPri='all';ui.fCamp='all';go('necesidades');
+    toast(d.path==='dinero'?'Elige qué necesidad quieres financiar':'Elige qué insumo puedes llevar');return;
+  }
+  openOnb(d.role,d.path);
 }
 function submitOnb(f){
   const role=f.dataset.role,alias=fval(f,'alias').trim()||(role==='ayuda'?'Voluntario nuevo':'Hogar nuevo'),sector=fval(f,'sector');
@@ -544,8 +581,8 @@ function submitOnb(f){
 
 /* ---------- motor de correspondencia ---------- */
 const TRANK={'Ahora':0,'Hoy':1,'Esta semana':2};
-const PRIMARY={agua:['agua'],salud:['salud'],higiene:['almacen','agua'],alimentos:['alimentos'],refugio:['almacen'],psicosocial:['psicosocial']};
-const SECOND={agua:['transporte'],alimentos:['transporte'],higiene:['transporte'],refugio:['transporte']};
+const PRIMARY={agua:['agua'],salud:['salud'],higiene:['almacen','agua'],alimentos:['alimentos'],refugio:['almacen'],psicosocial:['psicosocial'],juridica:['juridica'],transporte:['transporte'],manos:['manos'],cuidado:['cuidado']};
+const SECOND={agua:['transporte'],alimentos:['transporte'],higiene:['transporte'],refugio:['transporte'],manos:['almacen']};
 const CAP=2, MAXS=90;
 function scoreMatch(r,m){
   const prim=(PRIMARY[r.type]||[]).some(k=>m.skills.includes(k));
@@ -739,7 +776,8 @@ function vNecesidades(){
   const list=state.needs.filter(n=>(ui.fCat==='all'||n.cat===ui.fCat)&&(ui.fPri==='all'||n.pri===ui.fPri)&&(ui.fCamp==='all'||n.campId===ui.fCamp))
     .sort((a,b)=>(stats(a).miss===0)-(stats(b).miss===0)||PRI[a.pri].rank-PRI[b.pri].rank||stats(b).miss*b.cost-stats(a).miss*a.cost);
   const chip=(k,v,cur,l)=>'<button class="chip" data-act="'+k+'" data-v="'+v+'" aria-pressed="'+(cur===v)+'">'+l+'</button>';
-  return '<div class="card-h"><h2>Qué falta en los campamentos</h2></div>'
+  const gb=ui.give?'<div class="givebar"><span>Vas a donar</span><div class="chips"><button class="chip" data-act="give" data-v="dinero" aria-pressed="'+(ui.give==='dinero')+'">Dinero</button><button class="chip" data-act="give" data-v="insumos" aria-pressed="'+(ui.give==='insumos')+'">Insumos</button></div><span class="muted">'+(ui.give==='dinero'?'Pulsa Cubrir en lo que quieras financiar.':'Pulsa Cubrir y elige el centro de acopio donde lo llevarás.')+'</span></div>':'';
+  return '<div class="card-h"><h2>Qué falta en los campamentos</h2></div>'+gb
     +'<div class="filters"><div class="chips" role="group" aria-label="Categoría">'+chip('fCat','all',ui.fCat,'Todas')+Object.keys(CATS).map(k=>chip('fCat',k,ui.fCat,CATS[k])).join('')+'</div>'
     +'<div class="chips" role="group" aria-label="Prioridad">'+chip('fPri','all',ui.fPri,'Toda prioridad')+['critica','alta','media'].map(k=>chip('fPri',k,ui.fPri,PRI[k].label)).join('')+'</div>'
     +'<label style="display:flex;align-items:center;gap:8px;font-weight:500" for="fCamp">Campamento <select id="fCamp" data-change="fCamp" style="width:auto"><option value="all">Todos</option>'+camps.map(c=>'<option value="'+c.id+'"'+(ui.fCamp===c.id?' selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select></label></div>'
@@ -828,8 +866,8 @@ function openCover(id){
     +'<div><h2 id="mt">Cubrir necesidad</h2><div class="muted" style="font-size:13px">'+esc(n.item)+' · '+esc(c.name)+' · faltan '+num(s.miss)+' '+esc(n.unit)+'</div></div>'
     +'<label for="cv-qty">Cantidad ('+esc(n.unit)+')<input id="cv-qty" name="qty" type="number" min="1" max="'+s.miss+'" value="'+Math.min(s.miss,Math.max(1,Math.round(s.miss/4)))+'" required></label>'
     +'<fieldset><legend>¿Cómo quieres ayudar?</legend>'
-    +'<label class="opt" for="cv-m1"><input id="cv-m1" type="radio" name="mode" value="dinero" checked><span>Financiar la compra local<small>El dinero queda en el libro y se compra a un proveedor verificado.</small></span></label>'
-    +'<label class="opt" for="cv-m2"><input id="cv-m2" type="radio" name="mode" value="insumos"><span>Enviar insumos a un centro de acopio<small>Entregas tú el material y el lote recibe su QR.</small></span></label></fieldset>'
+    +'<label class="opt" for="cv-m1"><input id="cv-m1" type="radio" name="mode" value="dinero"'+(ui.give!=='insumos'?' checked':'')+'><span>Financiar la compra local<small>El dinero queda en el libro y se compra a un proveedor verificado.</small></span></label>'
+    +'<label class="opt" for="cv-m2"><input id="cv-m2" type="radio" name="mode" value="insumos"'+(ui.give==='insumos'?' checked':'')+'><span>Enviar insumos a un centro de acopio<small>Entregas tú el material y el lote recibe su QR.</small></span></label></fieldset>'
     +'<label for="cv-hub"><span id="cv-hublabel">Entrega del proveedor en</span><select id="cv-hub" name="hub">'+hubs.map(h=>'<option value="'+h.id+'"'+(h.id===first?' selected':'')+(okHub(h)?'':' disabled')+'>'+esc(h.name)+(okHub(h)?'':' (no recibe este insumo)')+'</option>').join('')+'</select></label>'
     +'<label for="cv-name">Tu nombre<input id="cv-name" name="donor" type="text" maxlength="40" placeholder="Opcional"></label>'
     +'<label class="chk" for="cv-pub"><input id="cv-pub" name="pub" type="checkbox"> Mostrar mi nombre en el libro público</label>'
@@ -913,6 +951,8 @@ const ACT={
   approveAll:()=>{const R=runMatching();R.matches.forEach(x=>assign(x.r.id,x.m.id,x.sc.total));render();toast(R.matches.length+' '+pl(R.matches.length,'asignación aprobada','asignaciones aprobadas')+' y registradas en el libro');},
   onb:()=>openOnb(),
   pickRole:d=>openOnb(d.role),
+  pickPath:d=>pickPath(d),
+  give:d=>{ui.give=d.v;render();},
   offer:d=>{if(offerHelp(d.id)){render();toast('Ayuda en camino, registrada en el libro');flashEl('req-'+d.id);}},
   resolve:d=>{if(resolveRequest(d.id)){render();toast('Ayuda confirmada, registrada en el libro');}},
   alert:()=>{const n=state.members.filter(x=>dist(ui.me.sector,x.sector)<=1).length;toast('Avisamos a '+n+' '+pl(n,'persona cercana','personas cercanas'));}
