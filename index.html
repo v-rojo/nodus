@@ -1,0 +1,886 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NODUS La Guaira</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<style>
+:root{
+  /* Idea: hoja de manifiesto de carga. Papel frío, tinta marina, cobalto para todo lo verificable. */
+  --paper:#EDF2F1; --surface:#FFFFFF; --surface-2:#F4F8F8; --ink:#0B2B36; --ink-2:#506B75; --line:#CBD9DB;
+  --accent:#1F4FD8; --on-accent:#FFFFFF; --accent-soft:#E3EAFB;
+  --ok:#1B7F5C; --ok-soft:#DFF3EA; --warn:#8A5A00; --warn-soft:#FBEFD2; --crit:#B3261E; --crit-soft:#FBE3E0;
+  --sea:#D3E5EA; --land:#E4EEEA; --ridge:#BCD3CB;
+  --display:'Bricolage Grotesque',system-ui,sans-serif; --body:'IBM Plex Sans',system-ui,sans-serif; --mono:'IBM Plex Mono',ui-monospace,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#0A1A20; --surface:#112A33; --surface-2:#0F232B; --ink:#E6F0F1; --ink-2:#9DB4BB; --line:#25414B;
+    --accent:#7FA2FF; --on-accent:#0A1A20; --accent-soft:#1B2F5C;
+    --ok:#4CC38A; --ok-soft:#12372B; --warn:#E3B341; --warn-soft:#3A2E0E; --crit:#FF8A80; --crit-soft:#3E1B19;
+    --sea:#0F2E38; --land:#122A2D; --ridge:#1A3B3C; color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#0A1A20; --surface:#112A33; --surface-2:#0F232B; --ink:#E6F0F1; --ink-2:#9DB4BB; --line:#25414B;
+  --accent:#7FA2FF; --on-accent:#0A1A20; --accent-soft:#1B2F5C;
+  --ok:#4CC38A; --ok-soft:#12372B; --warn:#E3B341; --warn-soft:#3A2E0E; --crit:#FF8A80; --crit-soft:#3E1B19;
+  --sea:#0F2E38; --land:#122A2D; --ridge:#1A3B3C; color-scheme:dark;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--paper);color:var(--ink);font:15px/1.5 var(--body)}
+.wrap{max-width:1180px;margin:0 auto;padding:0 16px}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.muted{color:var(--ink-2)}
+.mono{font-family:var(--mono)}
+
+header.top{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 0;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font:800 22px/1 var(--display);letter-spacing:-.01em}
+.brand small{display:block;font:500 12px/1.3 var(--body);color:var(--ink-2);letter-spacing:0;margin-top:3px}
+.chip-demo{font:500 12px var(--mono);border:1px dashed var(--warn);color:var(--warn);background:var(--warn-soft);padding:5px 10px;border-radius:999px}
+
+.hero{display:grid;grid-template-columns:1.25fr 1fr;gap:24px;align-items:end;padding:8px 0 24px}
+h1{font:800 clamp(28px,4.4vw,46px)/1.04 var(--display);letter-spacing:-.025em;margin:0 0 12px;text-wrap:balance}
+h2{font:700 20px/1.2 var(--display);margin:0 0 4px;text-wrap:balance}
+h3{font:700 16px/1.25 var(--display);margin:0}
+.lead{color:var(--ink-2);max-width:60ch;margin:0 0 16px}
+.demo-box{border:1px solid var(--line);border-left:4px solid var(--accent);background:var(--surface);border-radius:8px;padding:12px 14px;min-height:92px}
+.demo-box .step{font:500 12px var(--mono);color:var(--accent);margin-bottom:4px}
+.demo-box p{margin:0}
+
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:1px solid var(--accent);background:var(--accent);color:var(--on-accent);padding:9px 16px;border-radius:8px;font-weight:600;cursor:pointer;text-decoration:none}
+.btn:hover{filter:brightness(1.08)}
+.btn[disabled]{opacity:.5;cursor:not-allowed;filter:none}
+.btn.ghost{background:transparent;color:var(--accent)}
+.btn.small{padding:6px 11px;font-size:13px}
+.btn.crit{border-color:var(--crit);color:var(--crit);background:transparent}
+
+.tabs{display:flex;gap:2px;border-bottom:1px solid var(--line);position:sticky;top:0;background:var(--paper);z-index:5;overflow-x:auto}
+.tab{border:0;background:none;padding:13px 16px;font-weight:600;color:var(--ink-2);border-bottom:3px solid transparent;cursor:pointer;white-space:nowrap}
+.tab[aria-selected="true"]{color:var(--ink);border-bottom-color:var(--accent)}
+.tab small{font:500 11px var(--mono);margin-left:6px;color:var(--ink-2)}
+
+main{padding:20px 0 40px}
+.grid{display:grid;gap:16px}
+.kpis{grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.two{grid-template-columns:minmax(0,2fr) minmax(0,1fr)}
+.even{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:16px;min-width:0}
+.card.flat{background:var(--surface-2)}
+.card-h{display:flex;justify-content:space-between;align-items:flex-start;gap:12px;margin-bottom:12px;flex-wrap:wrap}
+.kpi .l{font:500 12px var(--mono);color:var(--ink-2);text-transform:uppercase;letter-spacing:.04em}
+.kpi .v{font:800 34px/1.1 var(--display);letter-spacing:-.02em;margin:6px 0 2px;font-variant-numeric:tabular-nums}
+.kpi .s{font-size:13px;color:var(--ink-2)}
+.kpi.ok{border-top:3px solid var(--ok)} .kpi.crit{border-top:3px solid var(--crit)} .kpi{border-top:3px solid var(--ink)}
+
+.pill{display:inline-flex;align-items:center;gap:5px;font:600 12px var(--body);padding:2px 9px;border-radius:999px;border:1px solid var(--line);background:var(--surface-2);white-space:nowrap}
+.pill.critica,.pill.crit{background:var(--crit-soft);color:var(--crit);border-color:var(--crit)}
+.pill.alta,.pill.warn,.pill.limitado{background:var(--warn-soft);color:var(--warn);border-color:var(--warn)}
+.pill.media,.pill.abierto,.pill.ok{background:var(--ok-soft);color:var(--ok);border-color:var(--ok)}
+.pill.cold{background:var(--accent-soft);color:var(--accent);border-color:var(--accent)}
+
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.chip{border:1px solid var(--line);background:var(--surface);padding:5px 12px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:500}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.filters{display:flex;gap:14px 20px;flex-wrap:wrap;align-items:center;margin-bottom:16px}
+.filters select{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:6px 10px}
+
+.bar{display:flex;height:11px;background:var(--surface-2);border:1px solid var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%}
+.s-del{background:var(--ok)}
+.s-fly{background:repeating-linear-gradient(135deg,var(--accent) 0 4px,var(--accent-soft) 4px 8px)}
+.legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12px;color:var(--ink-2)}
+.legend span:before{content:"";display:inline-block;width:12px;height:9px;margin-right:5px;border:1px solid var(--line);vertical-align:-1px}
+.legend .ld:before{background:var(--ok)} .legend .lf:before{background:repeating-linear-gradient(135deg,var(--accent) 0 3px,var(--accent-soft) 3px 6px)} .legend .lm:before{background:var(--surface-2)}
+
+.need{display:grid;gap:10px}
+.need .top{display:flex;justify-content:space-between;gap:10px;align-items:flex-start}
+.need .meta{display:flex;gap:6px 14px;flex-wrap:wrap;font-size:13px;color:var(--ink-2);font-variant-numeric:tabular-nums}
+.need .meta b{color:var(--ink)}
+.need-list{display:grid;gap:12px;grid-template-columns:repeat(auto-fill,minmax(340px,1fr))}
+
+.catrow{display:grid;grid-template-columns:150px 1fr;gap:10px;align-items:center;margin:10px 0;font-size:13px}
+.catrow .v{font:500 12px var(--mono);color:var(--ink-2)}
+
+.mapwrap svg{width:100%;height:auto;display:block;border-radius:8px;border:1px solid var(--line)}
+.mapwrap .pt{cursor:pointer}
+.mapwrap .pt:focus-visible{outline:none}
+.mapwrap .pt:focus-visible .shape{stroke:var(--accent);stroke-width:4}
+.route{stroke:var(--accent);stroke-width:3;stroke-dasharray:7 6;fill:none;animation:dash 1.2s linear infinite}
+@keyframes dash{to{stroke-dashoffset:-26}}
+.maplegend{display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--ink-2);margin-top:10px}
+
+.ticket{display:grid;grid-template-columns:104px minmax(0,1fr);gap:0;background:var(--surface);border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.ticket .stub{padding:12px;border-right:2px dashed var(--line);display:flex;flex-direction:column;align-items:center;gap:6px;background:var(--surface-2)}
+.qr{width:80px;height:80px;background:#fff;padding:4px;border-radius:4px;border:1px solid var(--line)}
+.qr svg{width:100%;height:100%;display:block}
+.ticket .body{padding:12px 14px;display:grid;gap:10px;min-width:0}
+.ticket .row{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;align-items:flex-start}
+.lot-id{font:500 13px var(--mono);color:var(--accent)}
+.route-line{font-size:13px;color:var(--ink-2)}
+.route-line b{color:var(--ink)}
+.steps{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+.steps li{display:grid;gap:1px;font-size:12px;color:var(--ink-2);border-top:4px solid var(--line);padding-top:6px}
+.steps li.done{border-top-color:var(--ok);color:var(--ink)}
+.steps li.now{border-top-color:var(--accent)}
+.steps li b{font-weight:600}
+.steps li small{font:400 11px var(--mono)}
+.lots{display:grid;gap:12px}
+.chain{margin:0;padding:8px 10px;background:var(--surface-2);border:1px solid var(--line);border-radius:6px;font:400 12px/1.6 var(--mono);list-style:none;overflow-x:auto}
+.chain li{white-space:nowrap}
+
+.tablewrap{overflow:auto;max-height:540px;border:1px solid var(--line);border-radius:8px;background:var(--surface)}
+table{border-collapse:collapse;width:100%;font-size:13px}
+th{position:sticky;top:0;background:var(--surface-2);text-align:left;font:500 11px var(--mono);text-transform:uppercase;letter-spacing:.04em;color:var(--ink-2);padding:8px 10px;border-bottom:1px solid var(--line);z-index:1}
+td{padding:8px 10px;border-bottom:1px solid var(--line);vertical-align:top}
+td.num{text-align:right;font-variant-numeric:tabular-nums;white-space:nowrap}
+td.h{font:400 11px var(--mono);color:var(--ink-2);white-space:nowrap}
+tr.bad td{background:var(--crit-soft)}
+.t{display:inline-block;font:600 11px var(--body);padding:1px 8px;border-radius:4px;white-space:nowrap}
+.t.in{background:var(--accent-soft);color:var(--accent)} .t.out{background:var(--warn-soft);color:var(--warn)} .t.mv{background:var(--surface-2);color:var(--ink);border:1px solid var(--line)} .t.done{background:var(--ok-soft);color:var(--ok)}
+.banner{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap;padding:12px 14px;border-radius:8px;border:1px solid;margin-bottom:12px}
+.banner.ok{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.banner.crit{background:var(--crit-soft);border-color:var(--crit);color:var(--crit)}
+.banner b{font-weight:700}
+.actions{display:flex;gap:8px;flex-wrap:wrap}
+
+form.f{display:grid;gap:12px}
+label{display:grid;gap:4px;font-size:13px;font-weight:600}
+input[type=text],input[type=number],select{width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:8px 10px;font-weight:400}
+fieldset{border:1px solid var(--line);border-radius:8px;padding:8px 12px;margin:0;display:grid;gap:6px}
+legend{font-size:13px;font-weight:600;padding:0 4px}
+.opt,.chk{display:flex;gap:8px;align-items:flex-start;font-weight:500}
+.opt small{display:block;color:var(--ink-2);font-weight:400}
+.sum{margin:0;padding:10px 12px;background:var(--accent-soft);border-radius:8px;font-size:13px}
+details.card summary{cursor:pointer;font:700 16px var(--display)}
+.formgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:12px}
+
+.overlay{position:fixed;inset:0;background:rgba(5,20,26,.55);display:grid;place-items:center;padding:16px;z-index:50;overflow:auto}
+.modal{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:20px;width:min(460px,100%);display:grid;gap:12px;max-height:100%;overflow:auto}
+.toast{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);background:var(--ink);color:var(--paper);padding:10px 16px;border-radius:8px;font-size:14px;z-index:60;max-width:calc(100% - 32px);opacity:0;pointer-events:none;transition:opacity .2s}
+.toast.on{opacity:1}
+.flash{animation:flash 1.8s ease-out 1}
+@keyframes flash{0%{box-shadow:0 0 0 4px var(--accent)}100%{box-shadow:0 0 0 0 transparent}}
+.ctx{display:grid;gap:10px;grid-template-columns:repeat(auto-fit,minmax(240px,1fr))}
+.ctx blockquote{margin:0;padding:10px 12px;border-left:3px solid var(--ink);background:var(--surface-2);font-size:13px}
+.ctx cite{display:block;margin-top:4px;font:400 11px var(--mono);color:var(--ink-2);font-style:normal}
+.ctx a{color:var(--accent)}
+.roles{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px}
+.role{text-align:left;border:2px solid var(--line);background:var(--surface);border-radius:12px;padding:16px;cursor:pointer;display:grid;gap:6px}
+.role:hover{border-color:var(--accent)}
+.role b{font:700 18px/1.2 var(--display)}
+.secgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:10px}
+.sec{border:1px solid var(--line);border-radius:10px;padding:10px 12px;background:var(--surface);font-size:13px;line-height:1.5}
+.sec b{display:block;font-size:14px}
+.sec.me{border:2px solid var(--accent)}
+.sec.near{background:var(--accent-soft)}
+footer{padding:20px 0 40px;color:var(--ink-2);font-size:13px;border-top:1px solid var(--line)}
+.empty{padding:24px;text-align:center;color:var(--ink-2);border:1px dashed var(--line);border-radius:10px}
+@media (max-width:860px){
+  .hero{grid-template-columns:1fr}
+  .two{grid-template-columns:1fr}
+  .need-list{grid-template-columns:1fr}
+  .catrow{grid-template-columns:1fr;gap:4px}
+}
+@media (max-width:520px){
+  .ticket{grid-template-columns:1fr}
+  .ticket .stub{flex-direction:row;border-right:0;border-bottom:2px dashed var(--line);justify-content:space-between}
+  .steps{grid-template-columns:repeat(2,1fr)}
+}
+@media (prefers-reduced-motion:reduce){ .route{animation:none} .flash{animation:none} .toast{transition:none} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header class="top">
+    <div class="brand">
+      <svg width="34" height="34" viewBox="0 0 34 34" aria-hidden="true"><rect width="34" height="34" rx="8" fill="var(--ink)"/><g stroke="var(--paper)" stroke-width="3" stroke-linecap="round"><path d="M8 11h18M8 17h18M8 23h18"/></g><g stroke="var(--accent)" stroke-width="3" stroke-linecap="round" style="mix-blend-mode:normal"><path d="M12 7v7M22 14v7M12 20v7"/></g></svg>
+      <div>NODUS<small>Ayuda trazable en red · La Guaira, Venezuela</small></div>
+    </div>
+    <div class="actions"><button class="btn ghost small" id="meChip" data-act="onb">Elegir perfil</button><span class="chip-demo">PROTOTIPO · DATOS SIMULADOS</span></div>
+  </header>
+
+  <section class="hero">
+    <div>
+      <h1>Cada insumo, cada dólar y cada entrega, a la vista.</h1>
+      <p class="lead">MVP para la respuesta al doble terremoto del 24 de junio de 2026 en La Guaira. Elige tu perfil y NODUS te conecta con tu red más cercana. Los campamentos publican lo que necesitan, los centros de acopio mueven lotes con QR y el libro registra cada paso con hashes encadenados.</p>
+      <div class="actions">
+        <button class="btn" id="demoBtn" data-act="demo">Ver una entrega completa</button>
+        <button class="btn ghost" data-act="onb">Quiero ayudar / Necesito ayuda</button><button class="btn ghost" data-act="go" data-tab="necesidades">Explorar por mi cuenta</button>
+      </div>
+    </div>
+    <div class="demo-box" aria-live="polite">
+      <div class="step" id="demoStep">DEMO</div>
+      <p id="demoText">Recorre una entrega completa: de la necesidad publicada en un campamento hasta la confirmación de entrega y el libro de fondos.</p>
+    </div>
+  </section>
+
+  <nav class="tabs" role="tablist" aria-label="Módulos del MVP" id="tabs"></nav>
+  <main id="view"></main>
+
+  <footer>
+    Prototipo de MVP con datos simulados. Los nombres de campamentos y centros son referencias geográficas para la demostración; las cantidades, donantes y lotes no representan inventarios ni donaciones reales. Esquema del mapa no a escala. Las cifras del contexto citan sus fuentes.
+  </footer>
+</div>
+<div id="modal"></div>
+<div class="toast" id="toast" role="status" aria-live="polite"></div>
+
+<script>
+(function(){
+'use strict';
+
+/* ---------- utilidades ---------- */
+const $=(s,r)=>(r||document).querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const grp=(n,d)=>{const [i,f]=Number(n).toFixed(d||0).split('.');return i.replace(/\B(?=(\d{3})+(?!\d))/g,'.')+(f?','+f:'');};
+const usd=n=>'US$ '+grp(n,Math.abs(n-Math.round(n))<0.005?0:2);
+const num=n=>grp(n,0);
+const pl=(n,a,b)=>n===1?a:b;
+const fdate=ts=>{const d=new Date(ts);return d.toLocaleDateString('es-ES',{day:'2-digit',month:'short'})+' '+d.toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});};
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+/* lectura de campos de formulario por nombre */
+const fld=(f,n)=>f.querySelector('[name="'+n+'"]');
+const fval=(f,n)=>{const el=fld(f,n);return el?el.value:'';};
+const fmode=f=>{const el=f.querySelector('[name="mode"]:checked');return el?el.value:'dinero';};
+
+/* SHA-256 síncrono, sin dependencias */
+const sha256=(function(){
+  const K=[],H0=[];let n=0;
+  for(let c=2;n<64;c++){let p=true;for(let d=2;d*d<=c;d++){if(c%d===0){p=false;break;}}
+    if(p){if(n<8)H0[n]=(Math.pow(c,.5)%1)*4294967296|0;K[n]=(Math.pow(c,1/3)%1)*4294967296|0;n++;}}
+  return function(str){
+    const b=new TextEncoder().encode(str),bits=b.length*8,total=((b.length+9+63)>>6)<<6;
+    const buf=new Uint8Array(total);buf.set(b);buf[b.length]=0x80;
+    const dv=new DataView(buf.buffer);dv.setUint32(total-4,bits>>>0);dv.setUint32(total-8,Math.floor(bits/4294967296));
+    const h=H0.slice(),w=new Array(64);
+    for(let o=0;o<total;o+=64){
+      for(let i=0;i<16;i++)w[i]=dv.getUint32(o+i*4);
+      for(let i=16;i<64;i++){const a=w[i-15],c=w[i-2];
+        const s0=((a>>>7)|(a<<25))^((a>>>18)|(a<<14))^(a>>>3);
+        const s1=((c>>>17)|(c<<15))^((c>>>19)|(c<<13))^(c>>>10);
+        w[i]=(w[i-16]+s0+w[i-7]+s1)|0;}
+      let a=h[0],b2=h[1],c=h[2],d=h[3],e=h[4],f=h[5],g=h[6],hh=h[7];
+      for(let i=0;i<64;i++){
+        const S1=((e>>>6)|(e<<26))^((e>>>11)|(e<<21))^((e>>>25)|(e<<7));
+        const ch=(e&f)^(~e&g);const t1=(hh+S1+ch+K[i]+w[i])|0;
+        const S0=((a>>>2)|(a<<30))^((a>>>13)|(a<<19))^((a>>>22)|(a<<10));
+        const mj=(a&b2)^(a&c)^(b2&c);const t2=(S0+mj)|0;
+        hh=g;g=f;f=e;e=(d+t1)|0;d=c;c=b2;b2=a;a=(t1+t2)|0;}
+      h[0]=(h[0]+a)|0;h[1]=(h[1]+b2)|0;h[2]=(h[2]+c)|0;h[3]=(h[3]+d)|0;h[4]=(h[4]+e)|0;h[5]=(h[5]+f)|0;h[6]=(h[6]+g)|0;h[7]=(h[7]+hh)|0;}
+    return h.map(x=>(x>>>0).toString(16).padStart(8,'0')).join('');
+  };
+})();
+
+/* ---------- datos del piloto (simulados) ---------- */
+const CATS={agua:'Agua y saneamiento',salud:'Salud',higiene:'Higiene',alimentos:'Alimentos',refugio:'Refugio'};
+const PRI={critica:{label:'Crítica',rank:0},alta:{label:'Alta',rank:1},media:{label:'Media',rank:2}};
+const STAGES=['Comprometido','En acopio','En tránsito','Entregado'];
+const SCAN_LABEL=['Recepción en acopio','Despacho al campamento','Confirmar entrega'];
+
+const camps=[
+  {id:'pg',n:1,name:'Estadio Playa Grande',sector:'Playa Grande',people:900,x:100,y:222,hubId:'mq'},
+  {id:'cn',n:2,name:'Estadio César Nieves',sector:'La Guaira',people:1650,x:372,y:184,hubId:'lg'},
+  {id:'mc',n:3,name:'Campamento Macuto',sector:'Macuto',people:640,x:518,y:164,hubId:'lg'},
+  {id:'cb',n:4,name:'Campamento Caraballeda',sector:'Caraballeda',people:780,x:646,y:142,hubId:'cr'},
+  {id:'ng',n:5,name:'Campamento Naiguatá',sector:'Naiguatá',people:430,x:786,y:112,hubId:'cr'}
+];
+const hubs=[
+  {id:'mq',code:'A',name:'Acopio Maiquetía',x:240,y:224,status:'abierto',cold:true,accepts:['agua','salud','higiene','alimentos','refugio']},
+  {id:'lg',code:'B',name:'Acopio La Guaira Centro',x:398,y:204,status:'limitado',cold:false,accepts:['agua','higiene','alimentos']},
+  {id:'cr',code:'C',name:'Acopio Caraballeda',x:612,y:168,status:'abierto',cold:false,accepts:['agua','higiene','alimentos','refugio']}
+];
+const SEED_NEEDS=[
+  {campId:'cn',item:'Agua potable en bidones de 20 L',cat:'agua',unit:'bidones',req:400,cost:4.5,pri:'critica'},
+  {campId:'cn',item:'Insulina NPH',cat:'salud',unit:'viales',req:120,cost:9,pri:'critica',cold:true},
+  {campId:'cn',item:'Kits de higiene familiar',cat:'higiene',unit:'kits',req:600,cost:7,pri:'alta'},
+  {campId:'pg',item:'Carpas familiares',cat:'refugio',unit:'carpas',req:90,cost:65,pri:'alta'},
+  {campId:'pg',item:'Mosquiteros',cat:'salud',unit:'unidades',req:350,cost:3.2,pri:'alta'},
+  {campId:'mc',item:'Tabletas potabilizadoras (caja de 100)',cat:'agua',unit:'cajas',req:80,cost:6,pri:'critica'},
+  {campId:'mc',item:'Pañales talla G',cat:'higiene',unit:'paquetes',req:260,cost:5.5,pri:'media'},
+  {campId:'cb',item:'Alimentos no perecederos (caja familiar)',cat:'alimentos',unit:'cajas',req:500,cost:18,pri:'alta'},
+  {campId:'cb',item:'Sales de rehidratación oral',cat:'salud',unit:'sobres',req:1500,cost:0.35,pri:'alta'},
+  {campId:'ng',item:'Tanques de agua de 1.000 L',cat:'agua',unit:'tanques',req:12,cost:95,pri:'critica'},
+  {campId:'ng',item:'Colchonetas',cat:'refugio',unit:'unidades',req:220,cost:14,pri:'media'}
+];
+/* [necesidad (1..11), cantidad, modo, centro, etapa final] */
+const SEED_LOTS=[
+  [1,180,'insumos','mq',3],[1,80,'dinero',null,2],[2,40,'dinero',null,3],[2,30,'insumos','mq',1],
+  [3,250,'insumos','lg',3],[3,120,'dinero',null,1],[4,30,'dinero',null,2],[5,150,'insumos','mq',3],
+  [6,35,'dinero',null,3],[7,100,'insumos','cr',1],[8,220,'insumos','cr',2],[9,600,'dinero',null,3],
+  [10,4,'dinero',null,2],[11,80,'insumos','mq',0]
+];
+const SEED_DONORS=['Fundación Costa Azul','Colectivo Litoral Solidario','Empresa Demo S.A.','Familia R.','Red de Voluntarios Caracas','Club Náutico Demo'];
+const DEMO_NEEDS=[
+  {item:'Filtros de agua familiares',cat:'agua',unit:'filtros',req:40,cost:28,pri:'critica'},
+  {item:'Kits de primeros auxilios',cat:'salud',unit:'kits',req:60,cost:12,pri:'alta'},
+  {item:'Mantas térmicas',cat:'refugio',unit:'mantas',req:150,cost:4,pri:'media'}
+];
+
+/* ---------- estado y libro ---------- */
+const GENESIS='0'.repeat(64);
+const state={needs:[],lots:[],ledger:[],members:[],requests:[]};
+const ui={tab:'resumen',sel:{kind:'camp',id:'cn'},fCat:'all',fPri:'all',fCamp:'all',fLot:'curso',chain:{},demo:false,demoN:0,tamper:null,me:null};
+let T=null;const now=()=>T===null?Date.now():T;
+
+const camp=id=>camps.find(c=>c.id===id);
+const hub=id=>hubs.find(h=>h.id===id);
+const need=id=>state.needs.find(n=>n.id===id);
+const lot=id=>state.lots.find(l=>l.id===id);
+
+const payload=e=>JSON.stringify([e.i,e.ts,e.type,e.actor,e.ref,e.detail,e.amount,e.qty,e.unit,e.prev]);
+function addEntry(o){
+  const i=state.ledger.length,prev=i?state.ledger[i-1].hash:GENESIS;
+  const e={i,ts:now(),type:o.type,actor:o.actor,ref:o.ref,detail:o.detail,amount:o.amount==null?null:o.amount,qty:o.qty==null?null:o.qty,unit:o.unit||null,prev};
+  e.hash=sha256(payload(e));state.ledger.push(e);return e;
+}
+function verify(){
+  const bad=[];let prev=GENESIS;
+  for(const e of state.ledger){
+    const linkOk=e.prev===prev,hashOk=sha256(payload(e))===e.hash;
+    if(!linkOk||!hashOk)bad.push({i:e.i,why:!hashOk?'contenido':'enlace'});
+    prev=e.hash;
+  }
+  return {ok:bad.length===0,bad,first:bad.length?bad[0].i:null};
+}
+function donorLabel(name,pub){
+  const n=(name||'').trim()||'Anónimo';
+  return pub?n:'Donante #'+sha256(n.toLowerCase()).slice(0,4).toUpperCase();
+}
+function stats(n){
+  let del=0,fly=0;
+  for(const l of state.lots){if(l.needId!==n.id)continue;if(l.stage===3)del+=l.qty;else fly+=l.qty;}
+  return {del,fly,miss:Math.max(0,n.req-del-fly)};
+}
+function pickHub(n){
+  const c=camp(n.campId),ok=h=>h.accepts.includes(n.cat)&&(!n.cold||h.cold);
+  const pref=hub(c.hubId);
+  return ok(pref)?pref:hubs.find(ok)||hubs[0];
+}
+function addNeed(o){
+  const n={id:'n'+(state.needs.length+1),campId:o.campId,item:o.item,cat:o.cat,unit:o.unit,req:o.req,cost:o.cost,pri:o.pri,cold:!!o.cold};
+  state.needs.push(n);return n;
+}
+function createLot(o){
+  const n=need(o.needId),c=camp(n.campId),h=hub(o.hubId||pickHub(n).id);
+  const id='L-'+String(state.lots.length+1).padStart(4,'0'),donor=donorLabel(o.donorName,o.pub);
+  const l={id,needId:n.id,qty:o.qty,mode:o.mode,hubId:h.id,donor,amount:o.qty*n.cost,stage:0,times:[],actors:[]};
+  state.lots.push(l);
+  let e;
+  if(o.mode==='dinero'){
+    e=addEntry({type:'DONACION',actor:donor,ref:id,detail:'Financia '+n.item+': '+o.qty+' '+n.unit+' para '+c.name,amount:l.amount});
+    addEntry({type:'COMPRA',actor:'Compras locales (proveedor verificado)',ref:id,detail:'Compra de '+n.item+': '+o.qty+' '+n.unit+'; entrega prevista en '+h.name,amount:l.amount});
+  }else{
+    e=addEntry({type:'COMPROMISO',actor:donor,ref:id,detail:'Compromete '+n.item+': '+o.qty+' '+n.unit+' hacia '+h.name,qty:o.qty,unit:n.unit});
+  }
+  l.times[0]=e.ts;l.actors[0]=donor;return l;
+}
+function scanLot(id){
+  const l=lot(id);if(!l||l.stage>=3)return null;
+  const n=need(l.needId),c=camp(n.campId),h=hub(l.hubId),s=l.stage+1;let e;
+  if(s===1)e=addEntry({type:'RECEPCION_ACOPIO',actor:'Operador · '+h.name,ref:id,detail:n.item+': '+l.qty+' '+n.unit+' recibidos y verificados en '+h.name,qty:l.qty,unit:n.unit});
+  if(s===2)e=addEntry({type:'DESPACHO',actor:'Transportista verificado',ref:id,detail:'Sale de '+h.name+' hacia '+c.name,qty:l.qty,unit:n.unit});
+  if(s===3)e=addEntry({type:'ENTREGA_CONFIRMADA',actor:'Responsable · '+c.name,ref:id,detail:'Entrega confirmada: '+n.item+', '+l.qty+' '+n.unit,qty:l.qty,unit:n.unit});
+  l.stage=s;l.times[s]=e.ts;l.actors[s]=e.actor;return e;
+}
+function addGeneral(amount,name,pub){
+  return addEntry({type:'DONACION_GENERAL',actor:donorLabel(name,pub),ref:'FONDO',detail:'Aporte al fondo general de La Guaira',amount});
+}
+function seed(){
+  T=Date.now()-6*86400000;const step=k=>{T+=Math.round((0.9+((k*37)%19)/10)*3600000);};
+  let k=1;
+  [[6000,'Fundación Costa Azul'],[2500,'Colectivo Litoral Solidario'],[1000,'Empresa Demo S.A.']].forEach(g=>{addGeneral(g[0],g[1],true);step(k++);});
+  SEED_NEEDS.forEach(n=>addNeed(n));
+  SEED_LOTS.forEach((s,idx)=>{
+    const n=state.needs[s[0]-1],l=createLot({needId:n.id,qty:s[1],mode:s[2],hubId:s[3],donorName:SEED_DONORS[idx%SEED_DONORS.length],pub:idx%3===0});
+    step(k++);while(l.stage<s[4]){scanLot(l.id);step(k++);}
+  });
+  T=null;
+}
+
+
+/* ---------- perfiles y red por cercanía ---------- */
+const SECTORS=['Playa Grande','Maiquetía','La Guaira','Macuto','Caraballeda','Naiguatá'];
+const HUB_SECTOR={mq:'Maiquetía',lg:'La Guaira',cr:'Caraballeda'};
+const SKILLS={transporte:'Transporte',salud:'Salud',agua:'Agua y saneamiento',alimentos:'Alimentos',psicosocial:'Apoyo psicosocial',almacen:'Acopio y almacén'};
+const RNEED={agua:'Agua potable',salud:'Salud',higiene:'Higiene',alimentos:'Alimentos',refugio:'Refugio',psicosocial:'Apoyo psicosocial'};
+const dist=(a,b)=>Math.abs(SECTORS.indexOf(a)-SECTORS.indexOf(b));
+const band=d=>d===0?'Tu sector':d===1?'Sector vecino':'A '+d+' sectores';
+const pseudo=(p,s)=>p+' #'+sha256(String(s).toLowerCase()).slice(0,4).toUpperCase();
+function addRequest(o){
+  const id='r'+(state.requests.length+1);
+  const r={id,sector:o.sector,type:o.type,urg:o.urg,when:o.when||({critica:'Ahora',alta:'Hoy',media:'Esta semana'})[o.urg],size:o.size,status:o.status||'abierta',helper:o.helper||null,by:pseudo('Hogar',id+o.sector+(o.alias||'')),ts:now()};
+  state.requests.push(r);
+  addEntry({type:'SOLICITUD',actor:r.by,ref:id,detail:'Solicitud de '+RNEED[r.type]+' en '+r.sector+' (urgencia '+PRI[r.urg].label.toLowerCase()+', para '+r.when.toLowerCase()+')'});
+  return r;
+}
+function offerHelp(rid){
+  const r=state.requests.find(x=>x.id===rid);if(!r||!ui.me||r.status!=='abierta')return false;
+  r.status='en camino';r.helper=ui.me.alias;
+  addEntry({type:'RED_AYUDA',actor:pseudo('Voluntario',ui.me.alias),ref:r.id,detail:'Ayuda en camino a la solicitud '+r.id+' ('+RNEED[r.type]+', '+r.sector+')'});
+  return true;
+}
+function resolveRequest(rid){
+  const r=state.requests.find(x=>x.id===rid);if(!r||r.status==='resuelta')return false;
+  r.status='resuelta';
+  addEntry({type:'RED_CONFIRMADA',actor:r.by,ref:r.id,detail:'Ayuda recibida y confirmada ('+RNEED[r.type]+', '+r.sector+')'});
+  return true;
+}
+function seedNet(){
+  [['Voluntaria Ana','La Guaira',['salud','psicosocial'],'Hoy'],['Transportista Luis','Maiquetía',['transporte'],'Hoy'],['Vecino Pedro','Macuto',['agua','almacen'],'Esta semana'],['Enfermera Marta','Caraballeda',['salud'],'Hoy'],['Cooperativa Litoral','Naiguatá',['alimentos','almacen'],'Esta semana'],['Voluntario José','Playa Grande',['transporte','agua'],'Hoy'],['Psicóloga Elena','La Guaira',['psicosocial'],'Esta semana'],['Vecina Rosa','Macuto',['alimentos'],'Hoy']]
+    .forEach((m,i)=>state.members.push({id:'m'+(i+1),alias:m[0],sector:m[1],skills:m[2],avail:m[3]}));
+  [['Macuto','agua','critica',5,'abierta'],['La Guaira','salud','alta',3,'abierta'],['Caraballeda','alimentos','media',4,'en camino','Enfermera Marta'],['Naiguatá','psicosocial','alta',6,'abierta'],['Maiquetía','higiene','media',2,'resuelta','Transportista Luis']]
+    .forEach(r=>addRequest({sector:r[0],type:r[1],urg:r[2],size:r[3],status:r[4],helper:r[5]||null,alias:'seed'}));
+}
+function reqCard(r){
+  const me=ui.me,d=me?dist(me.sector,r.sector):0;
+  const match=me&&me.role==='ayuda'&&(me.skills.includes(r.type)||(r.type==='higiene'&&me.skills.includes('almacen'))||(me.skills.includes('transporte')&&['agua','alimentos','higiene','refugio'].includes(r.type)));
+  const stCls=r.status==='resuelta'?'ok':r.status==='en camino'?'cold':'';
+  return '<article class="card need" id="req-'+r.id+'"><div class="top"><div><h3>'+RNEED[r.type]+' · '+esc(r.sector)+'</h3><div class="muted" style="font-size:13px">'+esc(r.by)+' · hogar de '+r.size+' '+pl(r.size,'persona','personas')+(me?' · '+band(d):'')+'</div></div><div class="chips">'+(match?'<span class="pill cold">Coincide contigo</span>':'')+priPill(r.urg)+'<span class="pill">Para: '+r.when+'</span></div></div>'
+    +'<div class="meta"><span class="pill '+stCls+'">'+(r.status==='abierta'?'Abierta':r.status==='en camino'?'Ayuda en camino':'Resuelta')+'</span>'+(r.helper?'<span>con <b>'+esc(r.helper)+'</b></span>':'')+'</div>'
+    +(me&&me.role==='ayuda'&&r.status==='abierta'?'<div><button class="btn small" data-act="offer" data-id="'+r.id+'">Ofrecer ayuda</button></div>':'')+'</article>';
+}
+function vRed(){
+  const me=ui.me,mem=state.members,reqs=state.requests;
+  const cnt=s=>({m:mem.filter(x=>x.sector===s).length,r:reqs.filter(x=>x.sector===s&&x.status!=='resuelta').length});
+  const strip='<div class="secgrid">'+SECTORS.map(s=>{const c=cnt(s),d=me?dist(me.sector,s):9;return '<div class="sec'+(d===0?' me':d===1?' near':'')+'"><b>'+s+'</b>'+(me?'<span class="muted">'+band(d)+'</span><br>':'')+c.m+' '+pl(c.m,'persona ayudando','personas ayudando')+'<br>'+c.r+' '+pl(c.r,'solicitud abierta','solicitudes abiertas')+'</div>';}).join('')+'</div>';
+  if(!me)return '<div class="card"><h2>Tu red cercana</h2><p class="muted" style="margin:4px 0 12px">Elige un perfil y NODUS te conecta con las personas, solicitudes y centros más próximos a tu sector.</p><button class="btn" data-act="onb">Elegir perfil</button></div><div style="margin-top:16px"><h3 style="margin-bottom:10px">Sectores del litoral</h3>'+strip+'</div>';
+  const near=x=>dist(me.sector,x.sector)<=1;
+  const helpersNear=mem.filter(near).length,openNear=reqs.filter(x=>near(x)&&x.status==='abierta').length,doneAll=reqs.filter(x=>x.status==='resuelta').length;
+  const head='<div class="card-h"><div><h2>Mi red · '+esc(me.sector)+'</h2><div class="muted" style="font-size:13px">'+(me.role==='ayuda'?'Perfil: Quiero ayudar':'Perfil: Necesito ayuda')+' · '+esc(me.alias)+'. La cercanía se calcula por sector del litoral; este prototipo no usa GPS.</div></div><button class="btn ghost small" data-act="onb">Cambiar perfil</button></div>'
+    +'<div class="grid kpis" style="margin-bottom:16px">'+kpi('Personas ayudando cerca',helpersNear,'En tu sector y los vecinos')+kpi('Solicitudes abiertas cerca',openNear,'Sin nombres: solo hogar, sector y urgencia')+kpi('Ayudas resueltas',doneAll,'Confirmadas por quien las recibió','ok')+'</div>';
+  let body='';
+  if(me.role==='ayuda'){
+    const open=reqs.filter(r=>r.status!=='resuelta').slice().sort((a,b)=>dist(me.sector,a.sector)-dist(me.sector,b.sector)||PRI[a.urg].rank-PRI[b.urg].rank);
+    body='<h3 style="margin:0 0 10px">Solicitudes cerca de ti</h3><div class="need-list">'+(open.length?open.map(reqCard).join(''):'<div class="empty">No hay solicitudes abiertas.</div>')+'</div>';
+  }else{
+    const mine=reqs.find(r=>r.id===me.requestId);
+    const skillNeed={agua:['agua'],salud:['salud'],higiene:['almacen'],alimentos:['alimentos'],refugio:['almacen'],psicosocial:['psicosocial']};
+    const helpers=mem.slice().sort((a,b)=>dist(me.sector,a.sector)-dist(me.sector,b.sector)||((mine&&(skillNeed[mine.type]||[]).some(k=>b.skills.includes(k)))-(mine&&(skillNeed[mine.type]||[]).some(k=>a.skills.includes(k)))));
+    const pts=camps.map(c=>({n:c.name,d:dist(me.sector,c.sector),k:'Campamento'})).concat(hubs.map(h=>({n:h.name,d:dist(me.sector,HUB_SECTOR[h.id]),k:'Acopio'}))).sort((a,b)=>a.d-b.d).slice(0,4);
+    body='<div class="grid two"><div>'
+      +(mine?'<h3 style="margin:0 0 10px">Tu solicitud</h3>'+reqCard(mine)+'<div class="actions" style="margin:12px 0 20px">'+(mine.status==='abierta'?'<button class="btn small" data-act="alert">Avisar a mi red</button>':'')+(mine.status!=='resuelta'?'<button class="btn ghost small" data-act="resolve" data-id="'+mine.id+'">Ya recibí ayuda</button>':'')+'</div>':'')
+      +'<h3 style="margin:0 0 10px">Personas cercanas que pueden ayudarte</h3><div style="display:grid;gap:10px">'+helpers.slice(0,6).map(m=>'<div class="card" style="padding:12px 14px"><div style="display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap"><b>'+esc(m.alias)+'</b><span class="pill">'+band(dist(me.sector,m.sector))+'</span></div><div class="chips" style="margin-top:6px">'+m.skills.map(k=>'<span class="pill">'+SKILLS[k]+'</span>').join('')+'<span class="pill ok">'+esc(m.avail)+'</span></div></div>').join('')+'</div></div>'
+      +'<aside class="card" style="align-self:start"><h3 style="margin-bottom:10px">Cerca de ti</h3><ul style="margin:0;padding-left:18px;font-size:14px">'+pts.map(p=>'<li><b>'+esc(p.n)+'</b> · '+p.k+' · '+band(p.d)+'</li>').join('')+'</ul><p class="muted" style="font-size:13px;margin:12px 0 0">Nadie ve tu nombre ni tu contacto. La conexión se hace dentro de NODUS y queda registrada sin datos personales.</p></aside></div>';
+  }
+  return head+body+'<h3 style="margin:24px 0 10px">Comunidad por sector</h3>'+strip;
+}
+function openOnb(role){
+  const m=$('#modal');
+  if(!role){
+    m.innerHTML='<div class="overlay" data-act="closeModal"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt"><div><h2 id="mt">Bienvenido a NODUS</h2><div class="muted" style="font-size:13px">Elige cómo participas. Te conectamos con tu red más cercana para actuar rápido.</div></div>'
+      +'<div class="roles"><button type="button" class="role" data-act="pickRole" data-role="ayuda"><b>Quiero ayudar</b><span class="muted">Voluntaria, vecino, transportista, profesional o proveedor.</span></button><button type="button" class="role" data-act="pickRole" data-role="necesito"><b>Necesito ayuda</b><span class="muted">Tu hogar o comunidad necesita agua, salud, comida, refugio o apoyo.</span></button></div>'
+      +'<button type="button" class="btn ghost" data-act="closeModal">Explorar primero</button></div></div>';
+    return;
+  }
+  const sec='<label for="ob-sec">¿En qué sector estás?<select id="ob-sec" name="sector">'+SECTORS.map(s=>'<option>'+s+'</option>').join('')+'</select></label>';
+  const alias='<label for="ob-alias">'+(role==='ayuda'?'Nombre o alias':'Alias (tu nombre real no se muestra)')+'<input id="ob-alias" name="alias" type="text" maxlength="30" placeholder="Opcional"></label>';
+  const extra=role==='ayuda'
+    ?'<fieldset><legend>¿En qué puedes ayudar?</legend>'+Object.keys(SKILLS).map(k=>'<label class="chk" for="sk-'+k+'"><input id="sk-'+k+'" type="checkbox" name="sk" value="'+k+'"> '+SKILLS[k]+'</label>').join('')+'</fieldset><label for="ob-av">Disponibilidad<select id="ob-av" name="avail"><option>Ahora</option><option selected>Hoy</option><option>Esta semana</option></select></label>'
+    :'<label for="ob-type">¿Qué necesitas?<select id="ob-type" name="type">'+Object.keys(RNEED).map(k=>'<option value="'+k+'">'+RNEED[k]+'</option>').join('')+'</select></label><label for="ob-urg">Urgencia<select id="ob-urg" name="urg"><option value="critica">Crítica</option><option value="alta" selected>Alta</option><option value="media">Media</option></select></label><label for="ob-when">¿Para cuándo?<select id="ob-when" name="when"><option>Ahora</option><option selected>Hoy</option><option>Esta semana</option></select></label><label for="ob-size">Personas en tu hogar<input id="ob-size" name="size" type="number" min="1" max="30" value="3" required></label><label class="chk" for="ob-ok"><input id="ob-ok" type="checkbox" name="ok" required> Acepto que mi solicitud se muestre sin nombre a personas cercanas</label>';
+  m.innerHTML='<div class="overlay" data-act="closeModal"><form class="modal" data-form="onb" data-role="'+role+'" role="dialog" aria-modal="true" aria-labelledby="mt"><div><h2 id="mt">'+(role==='ayuda'?'Quiero ayudar':'Necesito ayuda')+'</h2><div class="muted" style="font-size:13px">'+(role==='ayuda'?'Te mostramos las solicitudes más cercanas a tu sector.':'Tu solicitud llega primero a quienes están más cerca.')+'</div></div>'+alias+sec+extra
+    +'<div class="actions" style="justify-content:flex-end"><button type="button" class="btn ghost" data-act="onb">Atrás</button><button class="btn" type="submit">Entrar a mi red</button></div></form></div>';
+}
+function submitOnb(f){
+  const role=f.dataset.role,alias=fval(f,'alias').trim()||(role==='ayuda'?'Voluntario nuevo':'Hogar nuevo'),sector=fval(f,'sector');
+  if(role==='ayuda'){
+    const sk=Array.prototype.map.call(f.querySelectorAll('[name="sk"]:checked'),x=>x.value);
+    if(!sk.length){toast('Elige al menos una forma de ayudar.');return;}
+    state.members.push({id:'m'+(state.members.length+1),alias,sector,skills:sk,avail:fval(f,'avail')});
+    ui.me={role,alias,sector,skills:sk};
+  }else{
+    const r=addRequest({sector,type:fval(f,'type'),urg:fval(f,'urg'),when:fval(f,'when'),size:Math.max(1,parseInt(fval(f,'size'),10)||1),alias});
+    ui.me={role,alias,sector,skills:[],requestId:r.id};
+  }
+  $('#modal').innerHTML='';go('red');
+  toast(role==='ayuda'?'Ya estás en la red de '+sector:'Solicitud enviada a tu red cercana');
+}
+
+
+/* ---------- motor de correspondencia ---------- */
+const TRANK={'Ahora':0,'Hoy':1,'Esta semana':2};
+const PRIMARY={agua:['agua'],salud:['salud'],higiene:['almacen','agua'],alimentos:['alimentos'],refugio:['almacen'],psicosocial:['psicosocial']};
+const SECOND={agua:['transporte'],alimentos:['transporte'],higiene:['transporte'],refugio:['transporte']};
+const CAP=2, MAXS=90;
+function scoreMatch(r,m){
+  const prim=(PRIMARY[r.type]||[]).some(k=>m.skills.includes(k));
+  const sec=!prim&&(SECOND[r.type]||[]).some(k=>m.skills.includes(k));
+  if(!prim&&!sec)return null;
+  const d=dist(r.sector,m.sector),df=TRANK[m.avail]-TRANK[r.when];
+  const fit=prim?40:20,prox=[30,20,10,0][Math.min(d,3)],time=df<=0?20:df===1?8:0;
+  return {fit,prox,time,d,total:Math.round((fit+prox+time)*100/MAXS),role:prim?'Cubre la necesidad':'Apoyo logístico'};
+}
+function runMatching(){
+  const open=state.requests.filter(r=>r.status==='abierta').slice().sort((a,b)=>PRI[a.urg].rank-PRI[b.urg].rank||TRANK[a.when]-TRANK[b.when]||b.size-a.size);
+  const load={};state.members.forEach(m=>{load[m.alias]=state.requests.filter(r=>r.status==='en camino'&&r.helper===m.alias).length;});
+  const matches=[],gaps=[];
+  open.forEach(r=>{
+    const cands=state.members.map(m=>({m,sc:scoreMatch(r,m)})).filter(x=>x.sc);
+    const free=cands.filter(x=>load[x.m.alias]<CAP).sort((a,b)=>b.sc.total-a.sc.total||a.sc.d-b.sc.d);
+    if(free.length){const b=free[0];load[b.m.alias]++;matches.push({r,m:b.m,sc:b.sc,weak:b.sc.total<50});}
+    else gaps.push({r,reason:cands.length?'Quienes pueden ayudar ya tienen '+CAP+' asignaciones':'Nadie en la red tiene el perfil para '+RNEED[r.type].toLowerCase()});
+  });
+  return {open,matches,gaps};
+}
+function assign(rid,mid,total){
+  const r=state.requests.find(x=>x.id===rid),m=state.members.find(x=>x.id===mid);
+  if(!r||!m||r.status!=='abierta')return false;
+  r.status='en camino';r.helper=m.alias;
+  addEntry({type:'RED_AYUDA',actor:pseudo('Voluntario',m.alias),ref:r.id,detail:'Asignación aprobada por coordinación ('+total+'/100): '+RNEED[r.type]+' en '+r.sector});
+  return true;
+}
+function bars(title,rows){
+  const mx=Math.max(1,...rows.map(x=>x[1]));
+  return '<div class="card" style="padding:14px"><h3 style="margin:0 0 8px;font-size:15px">'+title+'</h3>'+rows.map(x=>'<div style="display:grid;grid-template-columns:110px 1fr 22px;gap:8px;align-items:center;font-size:13px;margin:4px 0"><span>'+x[0]+'</span><span style="background:var(--accent-soft);border-radius:4px;height:10px;display:block"><span style="display:block;height:10px;border-radius:4px;background:var(--accent);width:'+Math.round(x[1]*100/mx)+'%"></span></span><b>'+x[1]+'</b></div>').join('')+'</div>';
+}
+function vMotor(){
+  const R=runMatching(),open=R.open,M=R.matches,G=R.gaps;
+  const by=(keys,f)=>keys.map(k=>[k[1],open.filter(r=>f(r)===k[0]).length]);
+  const avg=M.length?Math.round(M.reduce((a,x)=>a+x.sc.total,0)/M.length):0;
+  const head='<div class="card-h"><div><h2>Motor de correspondencia</h2><div class="muted" style="font-size:13px">Analiza cada solicitud abierta (qué, dónde, cuándo y urgencia) y propone la mejor persona de la red. Coordinación aprueba; el motor nunca asigna solo.</div></div></div>'
+    +'<div class="grid kpis" style="margin-bottom:16px">'+kpi('Solicitudes abiertas',open.length,'Pendientes de ayuda')+kpi('Con propuesta',M.length,'Puntuación media '+avg+'/100','ok')+kpi('Sin cubrir',G.length,'Brechas de la red',G.length?'crit':'')+'</div>';
+  const an='<h3 style="margin:0 0 10px">Análisis de la demanda</h3><div class="grid two" style="margin-bottom:20px">'
+    +bars('Qué se necesita',Object.keys(RNEED).map(k=>[RNEED[k],open.filter(r=>r.type===k).length]).filter(x=>x[1]))
+    +bars('Dónde',SECTORS.map(k=>[k,open.filter(r=>r.sector===k).length]).filter(x=>x[1]))
+    +bars('Cuándo',['Ahora','Hoy','Esta semana'].map(k=>[k,open.filter(r=>r.when===k).length]).filter(x=>x[1]))
+    +bars('Urgencia',Object.keys(PRI).map(k=>[PRI[k].label,open.filter(r=>r.urg===k).length]).filter(x=>x[1]))+'</div>';
+  const list=M.length?M.map(x=>'<article class="card" id="mt-'+x.r.id+'" style="margin-bottom:10px"><div class="top"><div><h3>'+RNEED[x.r.type]+' · '+esc(x.r.sector)+' <span class="muted" style="font-weight:400">→ '+esc(x.m.alias)+'</span></h3><div class="muted" style="font-size:13px">'+esc(x.r.by)+' · '+x.r.size+' '+pl(x.r.size,'persona','personas')+' · '+esc(x.m.sector)+' · disponible: '+esc(x.m.avail)+'</div></div><div class="chips">'+priPill(x.r.urg)+'<span class="pill">Para: '+x.r.when+'</span><span class="pill '+(x.weak?'':'ok')+'">'+x.sc.total+'/100</span></div></div>'
+      +'<div class="meta"><span class="pill">'+x.sc.role+' '+x.sc.fit+'/'+(x.sc.fit===40?40:40)+'</span><span class="pill">Cercanía '+x.sc.prox+'/30 · '+band(x.sc.d)+'</span><span class="pill">Tiempo '+x.sc.time+'/20</span>'+(x.weak?'<span class="pill crit">Encaje débil</span>':'')+'</div>'
+      +'<div><button class="btn small" data-act="approve" data-id="'+x.r.id+'" data-m="'+x.m.id+'" data-s="'+x.sc.total+'">Aprobar asignación</button></div></article>').join(''):'<div class="empty">No hay propuestas pendientes.</div>';
+  const gaps=G.length?'<h3 style="margin:20px 0 10px">Brechas: solicitudes sin cubrir</h3>'+G.map(x=>'<div class="card" style="padding:12px 14px;margin-bottom:8px"><b>'+RNEED[x.r.type]+' · '+esc(x.r.sector)+'</b> '+priPill(x.r.urg)+' <span class="muted" style="font-size:13px">'+esc(x.reason)+'. Reclutar o pedir apoyo en sectores cercanos.</span></div>').join(''):'';
+  const rules='<details class="card" style="margin-top:20px;padding:12px 16px"><summary><b>Cómo puntúa el motor</b></summary><p class="muted" style="font-size:13px;margin:8px 0 0">Orden de atención: urgencia, luego plazo, luego tamaño del hogar. Puntuación sobre 100: encaje de habilidad (40 si cubre la necesidad, 20 si apoya con transporte), cercanía por sector (30 mismo sector, 20 vecino, 10 a dos, 0 más lejos) y disponibilidad respecto al plazo (20 si llega a tiempo, 8 si un tramo tarde). Cada persona acepta como máximo '+CAP+' asignaciones a la vez. Reglas visibles y ajustables; sin datos personales.</p></details>';
+  return head+an+'<div class="card-h" style="margin-top:4px"><h3>Asignaciones propuestas</h3>'+(M.length?'<button class="btn ghost small" data-act="approveAll">Aprobar todas</button>':'')+'</div>'+list+gaps+rules;
+}
+
+/* ---------- agregados ---------- */
+function totals(){
+  let recv=0,spent=0;
+  state.ledger.forEach(e=>{if(e.type==='DONACION'||e.type==='DONACION_GENERAL')recv+=e.amount;if(e.type==='COMPRA')spent+=e.amount;});
+  return {recv,spent,saldo:recv-spent};
+}
+function coverage(){
+  let req=0,del=0,fly=0;
+  state.needs.forEach(n=>{const s=stats(n);req+=n.req*n.cost;del+=s.del*n.cost;fly+=s.fly*n.cost;});
+  return {req,del,fly,pct:req?Math.round(del/req*100):0};
+}
+
+/* ---------- componentes ---------- */
+function bar(del,fly,req,label){
+  const d=req?Math.min(100,del/req*100):0,f=req?Math.min(100-d,fly/req*100):0;
+  return '<div class="bar" role="img" aria-label="'+esc(label)+'"><i class="s-del" style="width:'+d+'%"></i><i class="s-fly" style="width:'+f+'%"></i></div>';
+}
+function kpi(l,v,s,tone){return '<div class="card kpi '+(tone||'')+'"><div class="l">'+l+'</div><div class="v">'+v+'</div><div class="s">'+s+'</div></div>';}
+function priPill(p){return '<span class="pill '+p+'">'+PRI[p].label+'</span>';}
+function legend(){return '<div class="legend"><span class="ld">Entregado</span><span class="lf">En proceso</span><span class="lm">Falta</span></div>';}
+
+function qrSvg(text){
+  let n=0,dark=()=>false;
+  try{
+    if(typeof qrcode==='function'){const q=qrcode(0,'M');q.addData(text);q.make();n=q.getModuleCount();dark=(r,c)=>q.isDark(r,c);}
+  }catch(_){n=0;}
+  if(!n){ /* respaldo visual si la librería no cargó */
+    n=21;const h=sha256(text);const bit=i=>(parseInt(h[(i>>2)%64],16)>>(i&3))&1;
+    const finder=(r,c)=>{const f=(a,b)=>(a<7&&b<7);return f(r,c)||f(r,n-1-c)||f(n-1-r,c);};
+    dark=(r,c)=>{if(finder(r,c)){const rr=Math.min(r,n-1-r),cc=Math.min(c,n-1-c);const m=Math.max(rr<7?rr:n,cc<7?cc:n);const x=r<7?r:(n-1-r),y=c<7?c:(n-1-c);return x===0||y===0||x===6||y===6||(x>=2&&x<=4&&y>=2&&y<=4);}return bit(r*n+c)===1;};
+  }
+  let d='';
+  for(let r=0;r<n;r++)for(let c=0;c<n;c++)if(dark(r,c))d+='M'+c+' '+r+'h1v1h-1z';
+  return '<svg viewBox="0 0 '+n+' '+n+'" shape-rendering="crispEdges" role="img" aria-label="Código QR del lote"><path d="'+d+'" fill="#0B2B36"/></svg>';
+}
+
+/* ---------- mapa ---------- */
+function worstOpen(campId){
+  let w=null;
+  state.needs.filter(n=>n.campId===campId&&stats(n).miss>0).forEach(n=>{if(w===null||PRI[n.pri].rank<PRI[w].rank)w=n.pri;});
+  return w;
+}
+function mapSVG(){
+  const coast=[[0,262],[120,254],[240,236],[380,212],[520,190],[650,170],[780,142],[900,124]];
+  const path='M'+coast.map(p=>p.join(' ')).join(' L ');
+  const secs=[['Playa Grande',100],['Maiquetía',240],['La Guaira',380],['Macuto',520],['Caraballeda',650],['Naiguatá',790]];
+  const cy=x=>{for(let i=0;i<coast.length-1;i++){const a=coast[i],b=coast[i+1];if(x>=a[0]&&x<=b[0])return a[1]+(b[1]-a[1])*(x-a[0])/(b[0]-a[0]);}return 200;};
+  let s='<svg viewBox="0 0 900 330" role="img" aria-label="Esquema de la costa de La Guaira con campamentos y centros de acopio"><rect width="900" height="330" fill="var(--land)"/>';
+  s+='<path d="M0 140 L70 96 L170 112 L290 66 L410 86 L530 48 L650 78 L770 40 L900 62 L900 0 L0 0 Z" fill="var(--ridge)"/>';
+  s+='<text x="14" y="22" font-size="12" fill="var(--ink-2)" font-family="IBM Plex Mono,monospace">Cordillera de la Costa (esquema)</text>';
+  s+='<path d="'+path+' L900 330 L0 330 Z" fill="var(--sea)"/><path d="'+path+'" fill="none" stroke="var(--ink-2)" stroke-width="1.5"/>';
+  secs.forEach(t=>{s+='<text x="'+t[1]+'" y="'+(cy(t[1])+24)+'" font-size="12" text-anchor="middle" fill="var(--ink-2)" font-family="IBM Plex Sans,sans-serif">'+t[0]+'</text>';});
+  state.lots.filter(l=>l.stage===2).forEach(l=>{const h=hub(l.hubId),c=camp(need(l.needId).campId);s+='<line class="route" x1="'+h.x+'" y1="'+h.y+'" x2="'+c.x+'" y2="'+c.y+'"/>';});
+  hubs.forEach(h=>{
+    const sel=ui.sel.kind==='hub'&&ui.sel.id===h.id;
+    s+='<g class="pt" tabindex="0" role="button" data-act="mapSel" data-kind="hub" data-id="'+h.id+'" aria-label="'+esc(h.name)+'"><circle class="shape" cx="'+h.x+'" cy="'+h.y+'" r="13" fill="var(--surface)" stroke="'+(sel?'var(--accent)':'var(--ink)')+'" stroke-width="'+(sel?4:2)+'"/><text x="'+h.x+'" y="'+(h.y+4.5)+'" text-anchor="middle" font-size="13" font-weight="700" fill="var(--ink)" font-family="IBM Plex Mono,monospace">'+h.code+'</text></g>';
+  });
+  camps.forEach(c=>{
+    const w=worstOpen(c.id),fill=w==='critica'?'var(--crit)':w==='alta'?'var(--warn)':'var(--ok)',sel=ui.sel.kind==='camp'&&ui.sel.id===c.id;
+    s+='<g class="pt" tabindex="0" role="button" data-act="mapSel" data-kind="camp" data-id="'+c.id+'" aria-label="'+esc(c.name)+'"><rect class="shape" x="'+(c.x-13)+'" y="'+(c.y-13)+'" width="26" height="26" rx="4" fill="'+fill+'" stroke="'+(sel?'var(--accent)':'var(--surface)')+'" stroke-width="'+(sel?4:2)+'"/><text x="'+c.x+'" y="'+(c.y+5)+'" text-anchor="middle" font-size="14" font-weight="700" fill="#fff" font-family="IBM Plex Mono,monospace">'+c.n+'</text></g>';
+  });
+  return s+'</svg>';
+}
+function selPanel(){
+  if(ui.sel.kind==='hub'){
+    const h=hub(ui.sel.id),inv=state.lots.filter(l=>l.hubId===h.id&&l.stage===1);
+    const units=inv.reduce((a,l)=>a+l.qty,0);
+    return '<div class="card-h"><div><h3>'+esc(h.code+' · '+h.name)+'</h3><div class="muted" style="font-size:13px">Centro de acopio</div></div><span class="pill '+h.status+'">'+(h.status==='abierto'?'Abierto':'Cupo limitado')+'</span></div>'
+      +'<div class="chips" style="margin-bottom:10px">'+h.accepts.map(a=>'<span class="pill">'+CATS[a]+'</span>').join('')+(h.cold?'<span class="pill cold">Cadena de frío</span>':'')+'</div>'
+      +'<p style="margin:0 0 8px"><b>'+inv.length+'</b> '+pl(inv.length,'lote','lotes')+' en inventario ahora · <b>'+num(units)+'</b> unidades</p>'
+      +(inv.length?'<ul style="margin:0;padding-left:18px;font-size:13px">'+inv.map(l=>{const n=need(l.needId);return '<li>'+l.qty+' '+esc(n.unit)+' · '+esc(n.item)+' <span class="mono muted">'+l.id+'</span></li>';}).join('')+'</ul>':'<p class="muted" style="margin:0;font-size:13px">Sin lotes esperando despacho.</p>')
+      +'<p style="margin:12px 0 0"><button class="btn ghost small" data-act="go" data-tab="acopio">Ver lotes</button></p>';
+  }
+  const c=camp(ui.sel.id),list=state.needs.filter(n=>n.campId===c.id).sort((a,b)=>PRI[a.pri].rank-PRI[b.pri].rank);
+  return '<div class="card-h"><div><h3>'+c.n+' · '+esc(c.name)+'</h3><div class="muted" style="font-size:13px">'+esc(c.sector)+' · '+num(c.people)+' personas alojadas (simulado)</div></div></div>'
+    +list.map(n=>{const s=stats(n);return '<div style="margin:0 0 12px"><div style="display:flex;justify-content:space-between;gap:8px;font-size:13px"><span><b>'+esc(n.item)+'</b></span>'+priPill(n.pri)+'</div>'+bar(s.del*n.cost,s.fly*n.cost,n.req*n.cost,n.item+': '+s.del+' entregados, '+s.fly+' en proceso, faltan '+s.miss)+'<div class="muted" style="font-size:12px;display:flex;justify-content:space-between;margin-top:3px"><span>Faltan '+num(s.miss)+' de '+num(n.req)+' '+esc(n.unit)+'</span>'+(s.miss>0?'<button class="btn small" data-act="cover" data-id="'+n.id+'">Cubrir</button>':'<span class="pill ok">Cubierta</span>')+'</div></div>';}).join('')
+    +'<p style="margin:0"><button class="btn ghost small" data-act="go" data-tab="necesidades">Ver todas las necesidades</button></p>';
+}
+
+/* ---------- vistas ---------- */
+function vResumen(){
+  const V=verify(),T2=totals(),C=coverage(),active=state.lots.filter(l=>l.stage<3).length,fly=state.lots.filter(l=>l.stage===2).length;
+  const rows=Object.keys(CATS).map(k=>{let req=0,del=0,f=0;state.needs.filter(n=>n.cat===k).forEach(n=>{const s=stats(n);req+=n.req*n.cost;del+=s.del*n.cost;f+=s.fly*n.cost;});return {k,req,del,f};});
+  const max=Math.max.apply(null,rows.map(r=>r.req))||1;
+  const last=state.ledger.slice(-6).reverse();
+  return '<div class="grid kpis">'
+    +kpi('Fondos recibidos',usd(T2.recv),usd(T2.spent)+' gastados · '+usd(T2.saldo)+' sin asignar')
+    +kpi('Cobertura entregada',C.pct+'%',usd(C.del)+' entregados de '+usd(C.req)+' requeridos')
+    +kpi('Lotes en curso',active,fly+' en tránsito ahora')
+    +kpi('Libro de fondos',V.ok?'Íntegro':'Alterado',V.ok?state.ledger.length+' registros verificados':'Falla en el registro #'+V.first,V.ok?'ok':'crit')
+    +'</div>'
+    +'<div class="grid two" style="margin-top:16px">'
+    +'<div class="card mapwrap"><div class="card-h"><div><h2>Mapa de la respuesta</h2><div class="muted" style="font-size:13px">Pulsa un campamento o un centro de acopio. El color indica la necesidad abierta más urgente.</div></div></div>'+mapSVG()
+    +'<div class="maplegend"><span>■ Campamento con necesidad crítica (rojo), alta (ámbar) o cubierto (verde)</span><span>◯ Centro de acopio</span><span>┅ Lote en tránsito</span></div></div>'
+    +'<div class="card" id="selPanel">'+selPanel()+'</div></div>'
+    +'<div class="grid even" style="margin-top:16px">'
+    +'<div class="card"><div class="card-h"><div><h2>Valor de la ayuda por categoría</h2><div class="muted" style="font-size:13px">A costo unitario de referencia, frente a lo requerido.</div></div></div>'
+    +rows.map(r=>'<div class="catrow"><div><b>'+CATS[r.k]+'</b></div><div><div style="width:'+(r.req/max*100)+'%">'+bar(r.del,r.f,r.req,CATS[r.k]+': '+usd(r.del)+' entregados, '+usd(r.f)+' en proceso de '+usd(r.req))+'</div><div class="v">'+usd(r.del)+' entregados · '+usd(r.f)+' en proceso · '+usd(r.req)+' requeridos</div></div></div>').join('')
+    +legend()+'</div>'
+    +'<div class="card"><div class="card-h"><div><h2>Últimos movimientos</h2><div class="muted" style="font-size:13px">Visibles para cualquier persona. Sin datos de beneficiarios.</div></div><button class="btn ghost small" data-act="go" data-tab="fondos">Abrir libro</button></div>'
+    +'<ul style="list-style:none;margin:0;padding:0;display:grid;gap:8px">'+last.map(e=>'<li style="display:grid;grid-template-columns:auto 1fr;gap:10px;font-size:13px"><span class="t '+TYPE[e.type][1]+'" style="align-self:start">'+TYPE[e.type][0]+'</span><span>'+esc(e.detail)+'<br><span class="mono muted" style="font-size:11px">#'+e.i+' · '+fdate(e.ts)+' · '+e.hash.slice(0,10)+'…</span></span></li>').join('')+'</ul></div>'
+    +'</div>'
+    +'<section class="card flat" style="margin-top:16px"><div class="card-h"><div><h2>Por qué La Guaira</h2><div class="muted" style="font-size:13px">Contexto real, con sus fuentes. Los datos de la demostración son simulados.</div></div></div><div class="ctx">'
+    +'<blockquote>10.981 personas alojadas en 28 campamentos de La Guaira, el estado con más personas atendidas (cifras oficiales al 12 de julio de 2026).<cite><a href="https://www.vanguardia.com/mundo/2026/07/12/terremoto-en-venezuela-aumentan-a-94-los-campamentos-para-atender-a-mas-de-18000-damnificados/" target="_blank" rel="noopener">Vanguardia / EFE</a></cite></blockquote>'
+    +'<blockquote>La Guaira llegó a tener unos 32 centros de acopio registrados; muchos han cesado sus operaciones.<cite><a href="https://eldiario.com/2026/08/29/ayuda-la-guaira-terremotos/" target="_blank" rel="noopener">El Diario, 29 ago 2026</a></cite></blockquote>'
+    +'<blockquote>ONG con presencia en La Guaira alertaron de que la ayuda internacional ha bajado a dos meses del terremoto.<cite><a href="https://eldiario.com/2026/08/24/ayuda-humanitaria-venezuela-10/" target="_blank" rel="noopener">El Diario / EFE, 24 ago 2026</a></cite></blockquote>'
+    +'<blockquote>Damnificados en albergues de La Guaira denunciaron que la distribución de la ayuda no ha sido equitativa.<cite><a href="https://www.elsalvador.com/?p=1281317" target="_blank" rel="noopener">AFP vía elsalvador.com</a></cite></blockquote>'
+    +'</div></section>';
+}
+
+function needCard(n){
+  const s=stats(n),c=camp(n.campId);
+  return '<article class="card need" id="need-'+n.id+'"><div class="top"><div><h3>'+esc(n.item)+'</h3><div class="muted" style="font-size:13px">'+esc(c.name)+' · '+esc(CATS[n.cat])+'</div></div><div class="chips">'+(n.cold?'<span class="pill cold">Cadena de frío</span>':'')+priPill(n.pri)+'</div></div>'
+    +bar(s.del,s.fly,n.req,n.item+': '+s.del+' entregados, '+s.fly+' en proceso, faltan '+s.miss)
+    +'<div class="meta"><span>Entregado <b>'+num(s.del)+'</b></span><span>En proceso <b>'+num(s.fly)+'</b></span><span>Falta <b>'+num(s.miss)+'</b> de '+num(n.req)+' '+esc(n.unit)+'</span><span>Ref. '+usd(n.cost)+' por unidad</span></div>'
+    +'<div>'+(s.miss>0?'<button class="btn small" data-act="cover" data-id="'+n.id+'">Cubrir esta necesidad</button>':'<span class="pill ok">Necesidad cubierta</span>')+'</div></article>';
+}
+function vNecesidades(){
+  const list=state.needs.filter(n=>(ui.fCat==='all'||n.cat===ui.fCat)&&(ui.fPri==='all'||n.pri===ui.fPri)&&(ui.fCamp==='all'||n.campId===ui.fCamp))
+    .sort((a,b)=>(stats(a).miss===0)-(stats(b).miss===0)||PRI[a.pri].rank-PRI[b.pri].rank||stats(b).miss*b.cost-stats(a).miss*a.cost);
+  const chip=(k,v,cur,l)=>'<button class="chip" data-act="'+k+'" data-v="'+v+'" aria-pressed="'+(cur===v)+'">'+l+'</button>';
+  return '<div class="card-h"><div><h2>Necesidades publicadas por los campamentos</h2><div class="muted" style="font-size:13px">Los donantes responden a lo que falta de verdad, en lugar de enviar lo que sobra.</div></div></div>'
+    +'<div class="filters"><div class="chips" role="group" aria-label="Categoría">'+chip('fCat','all',ui.fCat,'Todas')+Object.keys(CATS).map(k=>chip('fCat',k,ui.fCat,CATS[k])).join('')+'</div>'
+    +'<div class="chips" role="group" aria-label="Prioridad">'+chip('fPri','all',ui.fPri,'Toda prioridad')+['critica','alta','media'].map(k=>chip('fPri',k,ui.fPri,PRI[k].label)).join('')+'</div>'
+    +'<label style="display:flex;align-items:center;gap:8px;font-weight:500" for="fCamp">Campamento <select id="fCamp" data-change="fCamp" style="width:auto"><option value="all">Todos</option>'+camps.map(c=>'<option value="'+c.id+'"'+(ui.fCamp===c.id?' selected':'')+'>'+esc(c.name)+'</option>').join('')+'</select></label></div>'
+    +legend()
+    +'<div class="need-list" style="margin:12px 0 20px">'+(list.length?list.map(needCard).join(''):'<div class="empty">Ninguna necesidad coincide con los filtros.</div>')+'</div>'
+    +'<details class="card"><summary>Publicar una necesidad (responsable de campamento)</summary>'
+    +'<form class="f" data-form="need"><div class="formgrid">'
+    +'<label for="nf-camp">Campamento<select id="nf-camp" name="campId">'+camps.map(c=>'<option value="'+c.id+'">'+esc(c.name)+'</option>').join('')+'</select></label>'
+    +'<label for="nf-item">Insumo<input id="nf-item" name="item" type="text" maxlength="60" required placeholder="Ej. Linternas solares"></label>'
+    +'<label for="nf-cat">Categoría<select id="nf-cat" name="cat">'+Object.keys(CATS).map(k=>'<option value="'+k+'">'+CATS[k]+'</option>').join('')+'</select></label>'
+    +'<label for="nf-unit">Unidad<input id="nf-unit" name="unit" type="text" maxlength="20" required placeholder="unidades"></label>'
+    +'<label for="nf-req">Cantidad requerida<input id="nf-req" name="req" type="number" min="1" max="100000" required></label>'
+    +'<label for="nf-cost">Costo de referencia (US$)<input id="nf-cost" name="cost" type="number" min="0" step="0.01" required></label>'
+    +'<label for="nf-pri">Prioridad<select id="nf-pri" name="pri"><option value="critica">Crítica</option><option value="alta" selected>Alta</option><option value="media">Media</option></select></label></div>'
+    +'<div><button class="btn" type="submit">Publicar necesidad</button></div></form></details>';
+}
+
+function lotTicket(l){
+  const n=need(l.needId),c=camp(n.campId),h=hub(l.hubId);
+  const next=l.stage<3?SCAN_LABEL[l.stage]:null;
+  const chain=state.ledger.filter(e=>e.ref===l.id);
+  return '<article class="ticket" id="lot-'+l.id+'"><div class="stub"><div class="qr">'+qrSvg('nodus://lote/'+l.id+'#'+(chain.length?chain[chain.length-1].hash.slice(0,12):''))+'</div><span class="lot-id">'+l.id+'</span></div>'
+    +'<div class="body"><div class="row"><div><h3>'+l.qty+' '+esc(n.unit)+' · '+esc(n.item)+'</h3><div class="route-line"><b>'+esc(l.donor)+'</b> → '+esc(h.name)+' → <b>'+esc(c.name)+'</b></div></div>'
+    +'<div class="chips"><span class="pill">'+(l.mode==='dinero'?'Compra con '+usd(l.amount):'Donación en especie')+'</span>'+(n.cold?'<span class="pill cold">Cadena de frío</span>':'')+'</div></div>'
+    +'<ol class="steps">'+STAGES.map((s,k)=>'<li class="'+(k<=l.stage?'done':'')+(k===l.stage&&l.stage<3?' now':'')+'"><b>'+s+'</b><small>'+(l.times[k]?fdate(l.times[k]):'pendiente')+'</small></li>').join('')+'</ol>'
+    +'<div class="actions">'+(next?'<button class="btn small" data-act="scan" data-id="'+l.id+'">Escanear QR · '+next+'</button>':'<span class="pill ok">Entrega confirmada por el campamento</span>')
+    +'<button class="btn ghost small" data-act="chain" data-id="'+l.id+'" aria-expanded="'+!!ui.chain[l.id]+'">'+(ui.chain[l.id]?'Ocultar cadena':'Ver cadena de custodia')+'</button></div>'
+    +(ui.chain[l.id]?'<ul class="chain">'+chain.map(e=>'<li>#'+e.i+' · '+TYPE[e.type][0]+' · '+e.hash.slice(0,16)+'… ← '+e.prev.slice(0,8)+'…</li>').join('')+'</ul>':'')
+    +'</div></article>';
+}
+function vAcopio(){
+  const f=ui.fLot;
+  const lots=state.lots.filter(l=>f==='todos'||(f==='curso'?l.stage<3:l.stage===3)).slice().sort((a,b)=>(b.times[b.stage]||0)-(a.times[a.stage]||0));
+  const chip=(v,l)=>'<button class="chip" data-act="fLot" data-v="'+v+'" aria-pressed="'+(f===v)+'">'+l+'</button>';
+  return '<div class="card-h"><div><h2>Centros de acopio y lotes con QR</h2><div class="muted" style="font-size:13px">Cada lote cambia de custodia con un escaneo. Cada escaneo queda en el libro.</div></div></div>'
+    +'<div class="grid even" style="margin-bottom:20px">'+hubs.map(h=>{const inv=state.lots.filter(l=>l.hubId===h.id&&l.stage===1);const units=inv.reduce((a,l)=>a+l.qty,0);
+      return '<div class="card"><div class="card-h" style="margin-bottom:8px"><div><h3>'+h.code+' · '+esc(h.name)+'</h3><div class="muted" style="font-size:13px">'+inv.length+' '+pl(inv.length,'lote','lotes')+' · '+num(units)+' unidades en inventario</div></div><span class="pill '+h.status+'">'+(h.status==='abierto'?'Abierto':'Cupo limitado')+'</span></div><div class="chips">'+h.accepts.map(a=>'<span class="pill">'+CATS[a]+'</span>').join('')+(h.cold?'<span class="pill cold">Cadena de frío</span>':'')+'</div></div>';}).join('')+'</div>'
+    +'<div class="filters"><div class="chips" role="group" aria-label="Estado del lote">'+chip('curso','En curso')+chip('entregados','Entregados')+chip('todos','Todos')+'</div><span class="muted" style="font-size:13px">'+lots.length+' '+pl(lots.length,'lote','lotes')+'</span></div>'
+    +'<div class="lots">'+(lots.length?lots.map(lotTicket).join(''):'<div class="empty">No hay lotes en este estado.</div>')+'</div>';
+}
+
+const TYPE={SOLICITUD:['Solicitud vecinal','in'],RED_AYUDA:['Ayuda vecinal','mv'],RED_CONFIRMADA:['Ayuda confirmada','done'],DONACION:['Donación','in'],DONACION_GENERAL:['Donación general','in'],COMPRA:['Compra local','out'],COMPROMISO:['Compromiso','mv'],RECEPCION_ACOPIO:['Recepción en acopio','mv'],DESPACHO:['Despacho','mv'],ENTREGA_CONFIRMADA:['Entrega confirmada','done']};
+function vFondos(){
+  const V=verify(),T2=totals(),badSet={};V.bad.forEach(b=>{badSet[b.i]=b.why;});
+  const banner=V.ok
+    ? '<div class="banner ok" role="status"><div><b>Cadena íntegra.</b> Se recalcularon '+state.ledger.length+' hashes y todos los enlaces coinciden.</div></div>'
+    : '<div class="banner crit" role="alert"><div><b>Alteración detectada en el registro #'+V.first+'.</b> '+(V.bad[0].why==='contenido'?'El contenido no coincide con su hash.':'El enlace con el registro anterior no coincide.')+' Quien audite el libro lo ve al instante.</div><button class="btn crit small" data-act="restore">Restaurar registro</button></div>';
+  const rows=state.ledger.slice().reverse().map(e=>{
+    const t=TYPE[e.type],val=e.amount!=null?usd(e.amount):(e.qty!=null?num(e.qty)+' '+esc(e.unit||''):'');
+    return '<tr class="'+(badSet[e.i]?'bad':'')+'"><td class="mono">#'+e.i+'</td><td>'+fdate(e.ts)+'</td><td><span class="t '+t[1]+'">'+t[0]+'</span></td><td>'+esc(e.actor)+'</td><td>'+esc(e.detail)+(badSet[e.i]?'<br><b style="color:var(--crit)">⚠ '+(badSet[e.i]==='contenido'?'El hash no coincide con el contenido':'No enlaza con el registro anterior')+'</b>':'')+'</td><td class="num">'+val+'</td><td class="h">'+e.hash.slice(0,12)+'…<br>← '+e.prev.slice(0,8)+'…</td></tr>';
+  }).join('');
+  return '<div class="grid kpis" style="margin-bottom:16px">'+kpi('Recibido',usd(T2.recv),'Donaciones con y sin destino')+kpi('Gastado en compras',usd(T2.spent),'Proveedores locales verificados')+kpi('Saldo sin asignar',usd(T2.saldo),'Visible para donantes y auditoría')+'</div>'
+    +'<div class="grid two"><div><div class="card-h"><div><h2>Libro de fondos y de especie</h2><div class="muted" style="font-size:13px">Registro de solo añadir. Cada fila incluye el hash del registro anterior. No contiene datos personales de beneficiarios; los donantes aparecen con seudónimo salvo que elijan mostrar su nombre.</div></div></div>'
+    +banner
+    +'<div class="actions" style="margin-bottom:12px"><button class="btn small" data-act="verify">Recalcular y verificar</button><button class="btn ghost small" data-act="tamper1"'+(ui.tamper?' disabled':'')+'>Simular alteración de un monto</button><button class="btn ghost small" data-act="tamper2"'+(ui.tamper?' disabled':'')+'>Alterar y recalcular el hash</button>'+(ui.tamper?'<button class="btn ghost small" data-act="restore">Restaurar</button>':'')+'</div>'
+    +'<div class="tablewrap" tabindex="0" aria-label="Libro de fondos"><table><thead><tr><th>#</th><th>Fecha</th><th>Tipo</th><th>Actor</th><th>Detalle</th><th style="text-align:right">Monto / cant.</th><th>Hash ← previo</th></tr></thead><tbody>'+rows+'</tbody></table></div></div>'
+    +'<aside class="card" style="align-self:start"><h3 style="margin-bottom:10px">Registrar donación general</h3><form class="f" data-form="general">'
+    +'<label for="g-amt">Monto (US$)<input id="g-amt" name="amount" type="number" min="1" step="1" required placeholder="500"></label>'
+    +'<label for="g-name">Tu nombre<input id="g-name" name="donor" type="text" maxlength="40" placeholder="Opcional"></label>'
+    +'<label class="chk" for="g-pub"><input id="g-pub" name="pub" type="checkbox"> Mostrar mi nombre en el libro público</label>'
+    +'<button class="btn" type="submit">Registrar en el libro</button></form>'
+    +'<p class="muted" style="font-size:13px;margin:12px 0 0">El saldo general se asigna después a necesidades concretas, y esa asignación también queda registrada.</p></aside></div>';
+}
+
+/* ---------- render y eventos ---------- */
+const TABS=[['resumen','Resumen'],['necesidades','Necesidades'],['acopio','Acopio y lotes'],['fondos','Libro de fondos'],['red','Mi red'],['motor','Motor de ayuda']];
+function render(){
+  $('#tabs').innerHTML=TABS.map((t,i)=>'<button class="tab" role="tab" id="tab-'+t[0]+'" aria-selected="'+(ui.tab===t[0])+'" data-act="go" data-tab="'+t[0]+'"><small>'+(i+1)+'</small>'+t[1]+'</button>').join('');
+  const v={resumen:vResumen,necesidades:vNecesidades,acopio:vAcopio,fondos:vFondos,red:vRed,motor:vMotor}[ui.tab];
+  $('#meChip').textContent=ui.me?(ui.me.role==='ayuda'?'Quiero ayudar':'Necesito ayuda')+' · '+ui.me.sector:'Elegir perfil';
+  const view=$('#view');view.setAttribute('role','tabpanel');view.setAttribute('aria-labelledby','tab-'+ui.tab);view.innerHTML=v();
+}
+function go(tab){
+  if(!TABS.some(t=>t[0]===tab))return;ui.tab=tab;
+  try{if(location.hash!=='#'+tab)location.hash=tab;}catch(_){}
+  render();
+}
+let toastT=null;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),2800);}
+function flashEl(id){const el=document.getElementById(id);if(!el)return;el.classList.remove('flash');void el.offsetWidth;el.classList.add('flash');try{el.scrollIntoView({block:'center',behavior:'smooth'});}catch(_){}}
+
+function openCover(id){
+  const n=need(id),s=stats(n),c=camp(n.campId);if(!n||s.miss<=0)return;
+  const okHub=h=>h.accepts.includes(n.cat)&&(!n.cold||h.cold),first=pickHub(n).id;
+  $('#modal').innerHTML='<div class="overlay" data-act="closeModal"><form class="modal" data-form="cover" data-need="'+n.id+'" role="dialog" aria-modal="true" aria-labelledby="mt">'
+    +'<div><h2 id="mt">Cubrir necesidad</h2><div class="muted" style="font-size:13px">'+esc(n.item)+' · '+esc(c.name)+' · faltan '+num(s.miss)+' '+esc(n.unit)+'</div></div>'
+    +'<label for="cv-qty">Cantidad ('+esc(n.unit)+')<input id="cv-qty" name="qty" type="number" min="1" max="'+s.miss+'" value="'+Math.min(s.miss,Math.max(1,Math.round(s.miss/4)))+'" required></label>'
+    +'<fieldset><legend>¿Cómo quieres ayudar?</legend>'
+    +'<label class="opt" for="cv-m1"><input id="cv-m1" type="radio" name="mode" value="dinero" checked><span>Financiar la compra local<small>El dinero queda en el libro y se compra a un proveedor verificado.</small></span></label>'
+    +'<label class="opt" for="cv-m2"><input id="cv-m2" type="radio" name="mode" value="insumos"><span>Enviar insumos a un centro de acopio<small>Entregas tú el material y el lote recibe su QR.</small></span></label></fieldset>'
+    +'<label for="cv-hub"><span id="cv-hublabel">Entrega del proveedor en</span><select id="cv-hub" name="hub">'+hubs.map(h=>'<option value="'+h.id+'"'+(h.id===first?' selected':'')+(okHub(h)?'':' disabled')+'>'+esc(h.name)+(okHub(h)?'':' (no recibe este insumo)')+'</option>').join('')+'</select></label>'
+    +'<label for="cv-name">Tu nombre<input id="cv-name" name="donor" type="text" maxlength="40" placeholder="Opcional"></label>'
+    +'<label class="chk" for="cv-pub"><input id="cv-pub" name="pub" type="checkbox"> Mostrar mi nombre en el libro público</label>'
+    +'<p class="sum" id="cv-sum"></p>'
+    +'<div class="actions" style="justify-content:flex-end"><button type="button" class="btn ghost" data-act="closeModal">Cancelar</button><button class="btn" type="submit">Confirmar</button></div></form></div>';
+  updateCover($('#modal form'));
+  const q=$('#cv-qty');if(q)q.focus();
+}
+function updateCover(f){
+  const n=need(f.dataset.need),q=Math.max(0,parseInt(fval(f,'qty'),10)||0),mode=fmode(f),h=hub(fval(f,'hub'));
+  $('#cv-hublabel').textContent=mode==='dinero'?'Entrega del proveedor en':'Centro de acopio';
+  $('#cv-sum').textContent=mode==='dinero'
+    ?'Total '+usd(q*n.cost)+' al costo de referencia. Se registra en el libro y se entrega en '+h.name+'.'
+    :'Compromiso de '+q+' '+n.unit+' hacia '+h.name+'. El lote queda con QR desde ahora.';
+}
+function submitCover(f){
+  const n=need(f.dataset.need),s=stats(n);let q=parseInt(fval(f,'qty'),10);
+  if(!(q>=1))return;q=Math.min(q,s.miss);
+  const h=hub(fval(f,'hub'));if(!(h.accepts.includes(n.cat)&&(!n.cold||h.cold))){toast('Ese centro no recibe este insumo.');return;}
+  const l=createLot({needId:n.id,qty:q,mode:fmode(f),hubId:h.id,donorName:fval(f,'donor'),pub:fld(f,'pub').checked});
+  $('#modal').innerHTML='';ui.fLot='curso';go('acopio');toast('Lote '+l.id+' creado y registrado en el libro');flashEl('lot-'+l.id);
+}
+function submitNeed(f){
+  const item=fval(f,'item').trim(),unit=fval(f,'unit').trim(),req=parseInt(fval(f,'req'),10),cost=parseFloat(fval(f,'cost'));
+  if(!item||!unit||!(req>=1)||!(cost>=0))return;
+  const n=addNeed({campId:fval(f,'campId'),item,cat:fval(f,'cat'),unit,req,cost,pri:fval(f,'pri')});
+  ui.fCat='all';ui.fPri='all';ui.fCamp='all';render();toast('Necesidad publicada');flashEl('need-'+n.id);
+}
+function submitGeneral(f){
+  const a=parseFloat(fval(f,'amount'));if(!(a>=1))return;
+  addGeneral(a,fval(f,'donor'),fld(f,'pub').checked);render();toast('Donación registrada en el libro');
+}
+function doTamper(recalc){
+  if(ui.tamper)return;
+  const cands=state.ledger.filter(e=>e.amount!=null&&e.i>3);if(!cands.length)return;
+  const e=cands[Math.floor(cands.length*0.4)];
+  ui.tamper={i:e.i,amount:e.amount,hash:e.hash};
+  e.amount=Math.round(e.amount*0.6*100)/100;
+  if(recalc)e.hash=sha256(payload(e));
+  render();toast(recalc?'Se alteró el registro #'+e.i+' y se recalculó su hash':'Se alteró el monto del registro #'+e.i);
+}
+function undoTamper(){
+  if(!ui.tamper)return;const e=state.ledger[ui.tamper.i];e.amount=ui.tamper.amount;e.hash=ui.tamper.hash;ui.tamper=null;render();toast('Registro restaurado');
+}
+function capt(step,total,text){$('#demoStep').textContent='PASO '+step+' DE '+total;$('#demoText').textContent=text;}
+async function demo(){
+  if(ui.demo)return;ui.demo=true;const btn=$('#demoBtn');btn.disabled=true;
+  try{
+    if(ui.tamper)undoTamper();
+    const d=DEMO_NEEDS[ui.demoN++%DEMO_NEEDS.length],TOT=6;
+    ui.fCat='all';ui.fPri='all';ui.fCamp='all';
+    capt(1,TOT,'El responsable del campamento de Naiguatá publica una necesidad.');go('necesidades');await sleep(600);
+    const n=addNeed({campId:'ng',item:d.item,cat:d.cat,unit:d.unit,req:d.req,cost:d.cost,pri:d.pri});render();flashEl('need-'+n.id);await sleep(2200);
+    capt(2,TOT,'Un donante financia 25 unidades. El dinero entra al libro y queda asignado a la compra local.');
+    const l=createLot({needId:n.id,qty:25,mode:'dinero',donorName:'Donante demo',pub:false});render();flashEl('need-'+n.id);await sleep(2400);
+    capt(3,TOT,'El proveedor entrega en el centro de acopio y se escanea el QR del lote.');ui.fLot='curso';go('acopio');await sleep(700);flashEl('lot-'+l.id);await sleep(1400);
+    scanLot(l.id);render();flashEl('lot-'+l.id);await sleep(2000);
+    capt(4,TOT,'El lote sale hacia el campamento con un transportista verificado.');scanLot(l.id);render();flashEl('lot-'+l.id);await sleep(2200);
+    capt(5,TOT,'El campamento confirma la recepción. La necesidad se actualiza al instante.');scanLot(l.id);render();flashEl('lot-'+l.id);await sleep(2400);
+    capt(6,TOT,'El libro de fondos guarda cada paso con hash encadenado. Cualquier alteración se detecta.');go('fondos');await sleep(600);
+    toast('Entrega completa registrada y verificada');
+  }finally{ui.demo=false;btn.disabled=false;}
+}
+
+const ACT={
+  go:d=>go(d.tab),
+  mapSel:d=>{ui.sel={kind:d.kind,id:d.id};render();},
+  fCat:d=>{ui.fCat=d.v;render();},
+  fPri:d=>{ui.fPri=d.v;render();},
+  fLot:d=>{ui.fLot=d.v;render();},
+  cover:d=>openCover(d.id),
+  closeModal:()=>{$('#modal').innerHTML='';},
+  scan:d=>{if(scanLot(d.id)){render();toast('Escaneo registrado en el libro');flashEl('lot-'+d.id);}},
+  chain:d=>{ui.chain[d.id]=!ui.chain[d.id];render();},
+  verify:()=>{const V=verify();toast(V.ok?'Cadena íntegra: '+state.ledger.length+' hashes verificados':'Se detectó una alteración en el registro #'+V.first);render();},
+  tamper1:()=>doTamper(false),
+  tamper2:()=>doTamper(true),
+  restore:()=>undoTamper(),
+  demo:()=>demo(),
+  approve:d=>{if(assign(d.id,d.m,+d.s)){render();toast('Asignación aprobada y registrada en el libro');}},
+  approveAll:()=>{const R=runMatching();R.matches.forEach(x=>assign(x.r.id,x.m.id,x.sc.total));render();toast(R.matches.length+' '+pl(R.matches.length,'asignación aprobada','asignaciones aprobadas')+' y registradas en el libro');},
+  onb:()=>openOnb(),
+  pickRole:d=>openOnb(d.role),
+  offer:d=>{if(offerHelp(d.id)){render();toast('Ayuda en camino, registrada en el libro');flashEl('req-'+d.id);}},
+  resolve:d=>{if(resolveRequest(d.id)){render();toast('Ayuda confirmada, registrada en el libro');}},
+  alert:()=>{const n=state.members.filter(x=>dist(ui.me.sector,x.sector)<=1).length;toast('Avisamos a '+n+' '+pl(n,'persona cercana','personas cercanas'));}
+};
+document.addEventListener('click',e=>{
+  const t=e.target.closest('[data-act]');if(!t)return;
+  if(t.classList.contains('overlay')&&e.target!==t)return;
+  const f=ACT[t.dataset.act];if(f)f(t.dataset);
+});
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&$('#modal').firstChild){ACT.closeModal();return;}
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('g[data-act]')){e.preventDefault();ACT[e.target.dataset.act](e.target.dataset);}
+});
+document.addEventListener('change',e=>{
+  const t=e.target.closest('[data-change]');if(t&&t.dataset.change==='fCamp'){ui.fCamp=t.value;render();}
+});
+document.addEventListener('input',e=>{const f=e.target.closest('form[data-form="cover"]');if(f)updateCover(f);});
+document.addEventListener('submit',e=>{
+  const f=e.target.closest('form[data-form]');if(!f)return;e.preventDefault();
+  ({cover:submitCover,need:submitNeed,general:submitGeneral,onb:submitOnb})[f.dataset.form](f);
+});
+window.addEventListener('hashchange',()=>{const h=location.hash.slice(1);if(h!==ui.tab&&TABS.some(t=>t[0]===h)){ui.tab=h;render();}});
+
+seed();seedNet();
+try{const h=location.hash.slice(1);if(TABS.some(t=>t[0]===h))ui.tab=h;}catch(_){}
+render();
+openOnb();
+})();
+</script>
+</body>
+</html>
